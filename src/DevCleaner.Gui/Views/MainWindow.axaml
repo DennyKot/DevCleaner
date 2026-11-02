@@ -107,7 +107,7 @@
             </StackPanel>
           </Grid>
 
-          <ProgressBar DockPanel.Dock="Top" Classes="thin" IsIndeterminate="True" IsVisible="{Binding IsBusy}" Margin="0,0,0,12" />
+          <ProgressBar DockPanel.Dock="Top" Classes="thin" Minimum="0" Maximum="100" IsIndeterminate="{Binding IsProgressIndeterminate}" Value="{Binding ProgressValue}" IsVisible="{Binding IsBusy}" Margin="0,0,0,12" />
 
           <!-- Action bar -->
           <Border DockPanel.Dock="Bottom" Classes="card" Padding="24,16" Margin="0,16,0,0" IsVisible="{Binding HasResults}">

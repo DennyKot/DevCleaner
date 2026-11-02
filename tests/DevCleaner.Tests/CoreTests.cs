@@ -140,6 +140,30 @@ public sealed class CoreTests : IDisposable
     }
 
     [Fact]
+    public void CleanEngine_ReportsStartAndCompletionProgress()
+    {
+        _t.File(@"a\x.bin", 100);
+        _t.File(@"b\y.bin", 300);
+        var a = new Finding { ProviderId = "t", Category = Category.Custom, Name = "a", Path = _t.P("a"), Kind = FindingKind.Directory, SizeBytes = 100 };
+        var b = new Finding { ProviderId = "t", Category = Category.Custom, Name = "b", Path = _t.P("b"), Kind = FindingKind.DirectoryContents, SizeBytes = 300 };
+        var events = new List<CleanProgress>();
+
+        new CleanEngine(new FakePlatform(), [], PathMatcher.Empty).Clean([a, b], new CleanOptions { Permanent = true }, new SyncProgress<CleanProgress>(events.Add));
+
+        Assert.Equal((0, "a", 0L), (events[0].ItemsDone, events[0].Current.Name, events[0].BytesDone));
+        Assert.Null(events[0].Completed);
+        Assert.Contains(events, e => e.Completed?.Finding == a && e.BytesDone == 100);
+        Assert.Equal(400, events[^1].BytesTotal);
+        Assert.Equal((2, 400L, 1.0), (events[^1].ItemsDone, events[^1].BytesDone, events[^1].Fraction));
+        Assert.Equal(events.Select(e => e.BytesDone).Order(), events.Select(e => e.BytesDone));
+    }
+
+    private sealed class SyncProgress<T>(Action<T> report) : IProgress<T>
+    {
+        public void Report(T value) => report(value);
+    }
+
+    [Fact]
     public void CleanEngine_SkipsExcludedAndLockedFiles()
     {
         var locked = _t.File(@"l\locked.bin", 100);

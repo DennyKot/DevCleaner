@@ -94,7 +94,8 @@ internal static class ScanCommands
 
             var options = new CleanOptions { DryRun = isDry, Permanent = pr.GetValue(permanent) || settings.PermanentDelete, Force = pr.GetValue(force) };
             var report = AnsiConsole.Status().Start("Cleaning...", ctx =>
-                host.CreateCleanEngine().Clean(findings, options, new Progress<CleanItemResult>(r => ctx.Status($"Cleaning {Markup.Escape(r.Finding.Name)}")), ct));
+                host.CreateCleanEngine().Clean(findings, options, new Progress<CleanProgress>(p => ctx.Status(
+                    $"Cleaning {Math.Min(p.ItemsDone + 1, p.ItemsTotal)}/{p.ItemsTotal} ({p.Fraction:P0}, {Bytes.Format(p.BytesDone)} of {Bytes.Format(p.BytesTotal)}) {Markup.Escape(p.Current.Name)}")), ct));
             var code = Output.Report(report);
             Export(pr.GetValue(export), pr.GetValue(format), (p, fmt) => ReportExporter.SaveCleanReport(p, report, fmt));
             return code;

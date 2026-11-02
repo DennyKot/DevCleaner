@@ -46,7 +46,13 @@ public sealed partial class MainViewModel : ObservableObject
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _status = "Scan your projects and caches to find reclaimable space.";
+    private bool _isProgressIndeterminate = true;
+
+    [ObservableProperty]
+    private double _progressValue;
+
+    [ObservableProperty]
+    private string _status =  "Scan your projects and caches to find reclaimable space.";
 
     [ObservableProperty]
     private string _lifetimeFreed = "";
@@ -217,13 +223,37 @@ public sealed partial class MainViewModel : ObservableObject
         IsBusy = true;
         _cts = new CancellationTokenSource();
         CleanReport? report = null;
+        CleanProgress? last = null;
+        var verb = DryRun ? "Checking" : "Cleaning";
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        void ShowProgress()
+        {
+            if (last is null)
+                return;
+            ProgressValue = last.Fraction * 100;
+            var current = last.Completed is null ? $" · {last.Current.Name}" : "";
+            Status = $"{verb} {Math.Min(last.ItemsDone + 1, last.ItemsTotal)}/{last.ItemsTotal} · "
+                + $"{Bytes.Format(last.BytesDone)} of {Bytes.Format(last.BytesTotal)} ({last.Fraction:P0}) · {watch.Elapsed:mm\\:ss}{current}";
+        }
+
+        using var ticker = new PeriodicTimer(TimeSpan.FromSeconds(1));
         try
         {
+            IsProgressIndeterminate = false;
+            ProgressValue = 0;
             var options = new CleanOptions { DryRun = DryRun, Permanent = settings.PermanentDelete, Force = Force };
-            var progress = new Progress<CleanItemResult>(r => Status = $"{r.Status}: {r.Finding.Name}");
+            var progress = new Progress<CleanProgress>(p =>
+            {
+                last = p;
+                ShowProgress();
+            });
             var engine = _host.CreateCleanEngine();
             var ct = _cts.Token;
-            report = await Task.Run(() => engine.Clean(findings, options, progress, ct), ct);
+            var work = Task.Run(() => engine.Clean(findings, options, progress, ct), ct);
+            // Keep the elapsed time ticking while a single large item is being processed.
+            while (!work.IsCompleted && await Task.WhenAny(work, ticker.WaitForNextTickAsync().AsTask()) != work)
+                ShowProgress();
+            report = await work;
             var failed = report.Items.Count(i => i.Status is CleanStatus.Failed or CleanStatus.Partial or CleanStatus.Skipped);
             Status = (report.DryRun ? "Would free " : "Freed ") + Bytes.Format(report.TotalBytesFreed)
                 + (failed > 0 ? $"; {failed} skipped or failed" : "");
@@ -237,6 +267,7 @@ public sealed partial class MainViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+            IsProgressIndeterminate = true;
         }
 
         if (report is not null)
