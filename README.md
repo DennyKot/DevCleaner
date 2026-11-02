@@ -46,7 +46,7 @@ On the machine used for these screenshots DevCleaner found **130 GB** across 1,4
 - **Project-aware** — detects .NET, Node.js, Rust, Python, Gradle and Maven projects and shows each project's **last modification date**. Projects you haven't touched for 90 days are flagged as **stale**.
 - **Git-aware** — inside any Git repo, folders matched by `.gitignore` are offered as build output (any language, via `git check-ignore`). Folders holding tracked files, IDE settings, `.env*`, `secrets/` etc. are never offered, and anything in a repo with **uncommitted changes** is raised to *Caution* with a warning. Requires `git` on `PATH`.
 - **Exclude forever** — right-click any project or folder and it will never be scanned or cleaned again.
-- **Safe by default** — files go to the **Recycle Bin**, there's a **dry run** mode, and every item has a risk level (Safe / Review / Caution). Only *Safe* items are pre-selected.
+- **Safe by default** — choose **permanent delete** (GUI default) or the **Recycle Bin**, there's a **dry run** mode, and every item has a risk level (Safe / Review / Caution). Only *Safe* items are pre-selected.
 - **Respects running apps** — browser and IDE caches are skipped while Chrome, Rider, VS Code etc. are running, and locked files are reported, not forced.
 - **Advanced file search** — glob, regex, extensions, size and age filters, plus a 50+ pattern "leftover files" preset (`*.tmp`, `*.dmp`, `*.crdownload`, `hs_err_pid*.log`, `*.pyc`, ...).
 - **Duplicate finder** — compares by content using a fast three-stage hash (size → 4 KB prefix → full xxHash64) and keeps the oldest copy.
@@ -152,7 +152,7 @@ Check a rule file with `devcleaner rules validate my-rules.json`. All built-in r
 
 DevCleaner deletes files, so it takes that seriously:
 
-- Recycle Bin by default; permanent delete is opt-in.
+- GUI deletes permanently by default (uncheck **Delete permanently** for Recycle Bin); CLI uses the Recycle Bin unless `--permanent`.
 - Hard-coded guard: never deletes a drive root, your user profile, `Windows`, `Program Files`, AppData roots, `.ssh`, or any parent of them.
 - Custom-rule targets can't contain `..` or path separators.
 - Symlinks and junctions are never followed.

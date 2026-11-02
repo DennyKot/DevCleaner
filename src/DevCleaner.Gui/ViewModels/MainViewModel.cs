@@ -84,6 +84,9 @@ public sealed partial class MainViewModel : ObservableObject
     private bool _force;
 
     [ObservableProperty]
+    private bool _permanentDelete = true;
+
+    [ObservableProperty]
     private string _filterText = "";
 
     /// <summary>Set by the view: shows the result of a clean run.</summary>
@@ -214,7 +217,7 @@ public sealed partial class MainViewModel : ObservableObject
 
         var settings = _host.Store.LoadSettings();
         var risky = findings.Count(f => f.Risk != RiskLevel.Safe);
-        var mode = DryRun ? "Dry run" : settings.PermanentDelete ? "PERMANENTLY delete" : "Move to Recycle Bin";
+        var mode = DryRun ? "Dry run" : PermanentDelete ? "PERMANENTLY delete" : "Move to Recycle Bin";
         var message = $"{mode}: {findings.Count} items, {Bytes.Format(findings.Sum(f => f.SizeBytes))}."
             + (risky > 0 ? $"\n{risky} item(s) are marked Review/Caution." : "");
         if (!await Confirm(message))
@@ -241,7 +244,7 @@ public sealed partial class MainViewModel : ObservableObject
         {
             IsProgressIndeterminate = false;
             ProgressValue = 0;
-            var options = new CleanOptions { DryRun = DryRun, Permanent = settings.PermanentDelete, Force = Force };
+            var options = new CleanOptions { DryRun = DryRun, Permanent = PermanentDelete, Force = Force };
             var progress = new Progress<CleanProgress>(p =>
             {
                 last = p;

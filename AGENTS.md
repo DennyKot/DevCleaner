@@ -30,7 +30,7 @@ dotnet run --project src\DevCleaner.Gui
 
 ## Safety rules (do not weaken)
 - All deletes go through `CleanEngine`; never bypass `SafetyGuard` or exclusions.
-- Default is Recycle Bin; permanent delete is opt-in.
+- GUI deletes permanently by default ("Delete permanently" checkbox; uncheck for Recycle Bin). CLI defaults to Recycle Bin; `--permanent` is opt-in. Always confirm before cleaning.
 - Never follow symlinks/junctions; rule targets must be plain folder names.
 - Registry changes must be preceded by a `.reg` backup.
 - Never run a real clean against the user's machine in tests or automation—use `--dry-run` or temp folders.
