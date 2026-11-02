@@ -29,10 +29,13 @@ jobs:
           dotnet publish src\DevCleaner.Gui -c Release -r win-x64 --self-contained -p:Version=${{ env.VERSION }} -o out\gui
           dotnet publish src\DevCleaner.Cli -c Release -r win-x64 --self-contained -p:Version=${{ env.VERSION }} -p:PublishSingleFile=true -o out\cli
 
-      - name: Build MSI
+      - name: Package GUI with Velopack
+        shell: pwsh
         run: |
-          dotnet tool install --global wix --version 5.*
-          wix build installer\DevCleaner.wxs -arch x64 -d Version=${{ env.VERSION }} -d PublishDir=${{ github.workspace }}\out\gui -o out\DevCleaner-${{ env.VERSION }}-x64.msi
+          dotnet tool install --global vpk --version 1.2.161
+          # Previous release lets vpk build a small delta package; none exists for the first Velopack release.
+          vpk download github --repoUrl https://github.com/${{ github.repository }} --token ${{ secrets.GITHUB_TOKEN }} -o out\releases
+          vpk pack --packId DevCleaner --packVersion ${{ env.VERSION }} --packDir out\gui --mainExe DevCleaner.exe --packTitle DevCleaner --icon src\DevCleaner.Gui\Assets\devcleaner.ico -o out\releases
 
       - name: Zip CLI
         shell: pwsh
@@ -42,5 +45,5 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            out/*.msi
+            out/releases/*
             out/*.zip

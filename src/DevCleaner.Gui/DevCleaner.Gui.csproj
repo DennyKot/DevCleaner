@@ -16,6 +16,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Velopack" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DevCleaner.Infrastructure\DevCleaner.Infrastructure.csproj" />
