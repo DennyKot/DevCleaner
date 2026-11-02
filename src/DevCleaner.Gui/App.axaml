@@ -1,0 +1,206 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DevCleaner.Gui.App"
+             RequestedThemeVariant="Light">
+  <Application.Resources>
+    <SolidColorBrush x:Key="AppBg" Color="#F4F5F9" />
+    <SolidColorBrush x:Key="SidebarBg" Color="#14162B" />
+    <SolidColorBrush x:Key="SidebarItemHover" Color="#232647" />
+    <SolidColorBrush x:Key="SidebarItemSelected" Color="#2D3166" />
+    <SolidColorBrush x:Key="CardBg" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="CardBorder" Color="#E6E8EF" />
+    <SolidColorBrush x:Key="TextPrimary" Color="#111827" />
+    <SolidColorBrush x:Key="TextSecondary" Color="#6B7280" />
+    <SolidColorBrush x:Key="Accent" Color="#5046E5" />
+    <SolidColorBrush x:Key="AccentSoft" Color="#EEF0FF" />
+    <SolidColorBrush x:Key="Success" Color="#16A34A" />
+    <SolidColorBrush x:Key="RowHover" Color="#F6F7FB" />
+  </Application.Resources>
+
+  <Application.Styles>
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Light" Accent="#5046E5" RegionColor="#F4F5F9" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
+
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{StaticResource AppBg}" />
+      <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+      <Setter Property="FontSize" Value="13" />
+    </Style>
+
+    <!-- Typography -->
+    <Style Selector="TextBlock.pageTitle">
+      <Setter Property="FontSize" Value="26" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+    </Style>
+    <Style Selector="TextBlock.pageSub">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.sectionTitle">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="0.6" />
+      <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.sub">
+      <Setter Property="FontSize" Value="11.5" />
+      <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.muted">
+      <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+    </Style>
+    <Style Selector="TextBlock.metric">
+      <Setter Property="FontSize" Value="28" />
+      <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+    <Style Selector="TextBlock.category">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <!-- Surfaces -->
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{StaticResource CardBg}" />
+      <Setter Property="BorderBrush" Value="{StaticResource CardBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="20" />
+      <Setter Property="BoxShadow" Value="0 1 3 0 #0F000000" />
+    </Style>
+    <Style Selector="Border.badge">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="8,2" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.badge TextBlock">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <!-- Buttons -->
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Padding" Value="14,7" />
+    </Style>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="{StaticResource Accent}" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Padding" Value="22,11" />
+      <Setter Property="FontSize" Value="14" />
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#4338CA" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#C7C9F0" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.secondary">
+      <Setter Property="Background" Value="{StaticResource CardBg}" />
+      <Setter Property="BorderBrush" Value="{StaticResource CardBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Padding" Value="16,9" />
+    </Style>
+
+    <!-- Inputs -->
+    <Style Selector="TextBox">
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="MinHeight" Value="36" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="NumericUpDown">
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <!-- Sidebar navigation -->
+    <Style Selector="ListBox.nav">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem">
+      <Setter Property="Padding" Value="14,11" />
+      <Setter Property="Margin" Value="0,2" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="Foreground" Value="#A9ADCC" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem PathIcon">
+      <Setter Property="Foreground" Value="#A9ADCC" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected PathIcon, ListBox.nav ListBoxItem:pointerover PathIcon">
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource SidebarItemHover}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource SidebarItemSelected}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource SidebarItemSelected}" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+
+    <!-- Pages: tab headers hidden, navigation is the sidebar -->
+    <Style Selector="TabControl.pages /template/ ItemsPresenter#PART_ItemsPresenter">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="TabControl.pages">
+      <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!-- Result tree -->
+    <Style Selector="TreeView.results TreeViewItem">
+      <Setter Property="MinHeight" Value="52" />
+    </Style>
+    <Style Selector="TreeView.results TreeViewItem /template/ Border#PART_LayoutRoot">
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="TreeView.results TreeViewItem:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{StaticResource RowHover}" />
+    </Style>
+    <Style Selector="TreeView.results TreeViewItem:selected /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{StaticResource AccentSoft}" />
+    </Style>
+    <Style Selector="TreeView.results TreeViewItem:selected:pointerover /template/ Border#PART_LayoutRoot">
+      <Setter Property="Background" Value="{StaticResource AccentSoft}" />
+    </Style>
+
+    <!-- Plain list rows -->
+    <Style Selector="ListBox.rows">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem">
+      <Setter Property="Padding" Value="12,10" />
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="CornerRadius" Value="8" />
+    </Style>
+    <Style Selector="ListBox.rows ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource AccentSoft}" />
+    </Style>
+
+    <Style Selector="ProgressBar.thin">
+      <Setter Property="MinHeight" Value="4" />
+      <Setter Property="Height" Value="4" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Background" Value="#EEF0F5" />
+    </Style>
+  </Application.Styles>
+</Application>

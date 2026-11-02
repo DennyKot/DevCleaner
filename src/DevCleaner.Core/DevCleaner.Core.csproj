@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="System.IO.Hashing" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Rules\builtin-rules.json" LogicalName="DevCleaner.Core.builtin-rules.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DevCleaner.Core.Tests" />
+  </ItemGroup>
+</Project>

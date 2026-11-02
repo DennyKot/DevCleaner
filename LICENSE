@@ -1,0 +1,85 @@
+DevCleaner Personal Use License
+Version 1.0
+
+Copyright (c) 2026 Denys Kotenko. All rights reserved.
+
+1. DEFINITIONS
+
+"Software" means DevCleaner, including its source code, binaries, rule files,
+documentation, and assets, as published by the Licensor.
+
+"Licensor" means the copyright holder named above.
+
+"Personal Use" means use by a single individual for their own private,
+non-commercial purposes, on devices they personally own or control, and not
+on behalf of, or for the benefit of, any company, organization, government
+body, or other legal entity.
+
+"Commercial or Enterprise Use" means any use that is not Personal Use,
+including use by or within a business, corporation, partnership, non-profit,
+educational or government institution; use on devices owned or managed by
+such an entity; use as part of paid work or services; and any use that
+generates revenue directly or indirectly.
+
+"Contribution" means any change, fix, or addition submitted to the Licensor
+through the official repository's pull request or issue tracker.
+
+2. GRANT OF LICENSE
+
+Subject to the terms of this License, the Licensor grants you a personal,
+non-exclusive, non-transferable, non-sublicensable, revocable license to:
+
+  a) download, install, and run the Software for Personal Use only; and
+  b) view and study the source code; and
+  c) make temporary local modifications solely to prepare a Contribution.
+
+3. RESTRICTIONS
+
+Except as expressly permitted in Section 2, you may NOT:
+
+  a) use the Software for any Commercial or Enterprise Use;
+  b) fork, copy, or maintain a separate or derivative version of the
+     Software, whether public or private, other than a temporary copy that
+     exists solely to prepare and submit a Contribution;
+  c) redistribute, publish, sell, rent, lease, or sublicense the Software
+     or any modified version of it, in source or binary form;
+  d) incorporate the Software, or any part of it, into another product or
+     service;
+  e) remove or alter any copyright, license, or attribution notices.
+
+Any copy of the repository made on a code-hosting platform (for example, a
+"fork" created only because the platform requires it to open a pull request)
+must be used solely for submitting Contributions and must not be distributed,
+released, or used for any other purpose.
+
+4. CONTRIBUTIONS
+
+By submitting a Contribution, you confirm that you have the right to do so
+and you grant the Licensor a perpetual, worldwide, irrevocable, royalty-free,
+non-exclusive license to use, modify, sublicense, relicense, and distribute
+your Contribution as part of the Software or otherwise. Contributions do not
+grant you any additional rights to the Software.
+
+5. COMMERCIAL LICENSING
+
+Commercial or Enterprise Use requires a separate written license from the
+Licensor. Contact the Licensor through the official repository.
+
+6. TERMINATION
+
+This License terminates automatically if you breach any of its terms. Upon
+termination you must stop using the Software and destroy all copies in your
+possession.
+
+7. DISCLAIMER OF WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. THE SOFTWARE DELETES
+FILES; YOU ARE SOLELY RESPONSIBLE FOR REVIEWING WHAT IT REMOVES.
+
+8. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES, DATA LOSS,
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.

@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DevCleaner.Cli/DevCleaner.Cli.csproj" />
+    <Project Path="src/DevCleaner.Core/DevCleaner.Core.csproj" />
+    <Project Path="src/DevCleaner.Gui/DevCleaner.Gui.csproj" />
+    <Project Path="src/DevCleaner.Infrastructure/DevCleaner.Infrastructure.csproj" />
+    <Project Path="src/DevCleaner.Platform.Unix/DevCleaner.Platform.Unix.csproj" />
+    <Project Path="src/DevCleaner.Platform.Windows/DevCleaner.Platform.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DevCleaner.Tests/DevCleaner.Tests.csproj" />
+  </Folder>
+</Solution>

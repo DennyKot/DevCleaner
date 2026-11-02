@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\DevCleaner.Core\DevCleaner.Core.csproj" />
+    <ProjectReference Include="..\DevCleaner.Platform.Windows\DevCleaner.Platform.Windows.csproj" />
+    <ProjectReference Include="..\DevCleaner.Platform.Unix\DevCleaner.Platform.Unix.csproj" />
+  </ItemGroup>
+</Project>

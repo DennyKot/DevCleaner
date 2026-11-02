@@ -1,0 +1,521 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DevCleaner.Gui.ViewModels"
+        xmlns:ctl="using:DevCleaner.Gui.Controls"
+        xmlns:du="using:DevCleaner.Core.DiskUsage"
+        xmlns:p="using:DevCleaner.Infrastructure.Persistence"
+        x:Class="DevCleaner.Gui.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="DevCleaner" Icon="/Assets/devcleaner.ico" Width="1320" Height="860" MinWidth="1000" MinHeight="640">
+
+  <Window.Styles>
+    <Style Selector="TreeView.results TreeViewItem" x:DataType="vm:ResultNode">
+      <Setter Property="IsVisible" Value="{Binding IsShown}" />
+    </Style>
+  </Window.Styles>
+
+  <Grid ColumnDefinitions="232,*">
+
+    <!-- ===================== Sidebar ===================== -->
+    <Border Background="{StaticResource SidebarBg}">
+      <DockPanel Margin="14,20,14,16">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="8,0,0,28">
+          <Image Source="/Assets/devcleaner-256.png" Width="38" Height="38" />
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="DevCleaner" Foreground="White" FontWeight="Bold" FontSize="16" />
+            <TextBlock Text="Developer disk cleanup" Foreground="#7C80A6" FontSize="11" />
+          </StackPanel>
+        </StackPanel>
+
+        <!-- Lifetime card -->
+        <Border DockPanel.Dock="Bottom" CornerRadius="12" Padding="16,14" Background="#1E2140">
+          <StackPanel Spacing="2">
+            <TextBlock Text="FREED ALL TIME" FontSize="10.5" FontWeight="SemiBold" LetterSpacing="0.6" Foreground="#7C80A6" />
+            <TextBlock Text="{Binding LifetimeFreed}" FontSize="24" FontWeight="Bold" Foreground="#4ADE80" />
+            <TextBlock Text="{Binding LifetimeRuns}" FontSize="11" Foreground="#7C80A6" />
+          </StackPanel>
+        </Border>
+
+        <ListBox Classes="nav" SelectedIndex="{Binding SelectedPage}">
+          <ListBoxItem AutomationProperties.Name="Cleanup">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" />
+              <TextBlock Text="Cleanup" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+          <ListBoxItem AutomationProperties.Name="Projects">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
+              <TextBlock Text="Projects" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+          <ListBoxItem AutomationProperties.Name="File search">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+              <TextBlock Text="File search" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+          <ListBoxItem AutomationProperties.Name="Duplicates">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+              <TextBlock Text="Duplicates" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+          <ListBoxItem AutomationProperties.Name="Disk usage">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M11,2V22C5.9,21.5 2,17.2 2,12C2,6.8 5.9,2.5 11,2M13,2V11H22C21.5,6.2 17.8,2.5 13,2M13,13V22C17.7,21.5 21.5,17.8 22,13H13Z" />
+              <TextBlock Text="Disk usage" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+          <ListBoxItem AutomationProperties.Name="History">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z" />
+              <TextBlock Text="History" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+          <ListBoxItem AutomationProperties.Name="Settings">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M3,17V19H9V17H3M3,5V7H13V5H3M13,21V19H21V17H13V15H11V21H13M7,9V11H3V13H7V15H9V9H7M21,13V11H11V13H21M15,9H17V7H21V5H17V3H15V9Z" />
+              <TextBlock Text="Settings" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+        </ListBox>
+      </DockPanel>
+    </Border>
+
+    <!-- ===================== Pages ===================== -->
+    <TabControl Grid.Column="1" Classes="pages" SelectedIndex="{Binding SelectedPage}">
+
+      <!-- ===== Cleanup ===== -->
+      <TabItem>
+        <DockPanel Margin="32,28,32,24">
+          <!-- Header -->
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="pageTitle" Text="Cleanup" />
+              <TextBlock Classes="pageSub" Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+              <Button Classes="secondary" Content="Cancel" Command="{Binding CancelCommand}" IsVisible="{Binding IsBusy}" />
+              <Button Classes="secondary" Content="Export…" Command="{Binding ExportCommand}" IsVisible="{Binding HasResults}" AutomationProperties.Name="Export report" />
+              <Button Classes="secondary" Command="{Binding ScanCommand}" AutomationProperties.Name="Rescan">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Width="14" Height="14" Data="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.140,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z" />
+                  <TextBlock Text="Rescan" />
+                </StackPanel>
+              </Button>
+            </StackPanel>
+          </Grid>
+
+          <ProgressBar DockPanel.Dock="Top" Classes="thin" IsIndeterminate="True" IsVisible="{Binding IsBusy}" Margin="0,0,0,12" />
+
+          <!-- Action bar -->
+          <Border DockPanel.Dock="Bottom" Classes="card" Padding="24,16" Margin="0,16,0,0" IsVisible="{Binding HasResults}">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Classes="label" Text="SELECTED" />
+                <TextBlock Classes="metric" Foreground="{StaticResource Accent}" Text="{Binding SelectedText}" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="28,0,0,0">
+                <TextBlock Classes="label" Text="FOUND" />
+                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{Binding ReclaimableText}" />
+                <TextBlock Classes="sub" Text="{Binding FoundCount}" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="24" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,24,0">
+                <ToggleSwitch IsChecked="{Binding DryRun}" OnContent="Dry run" OffContent="Dry run" ToolTip.Tip="Only report what would be removed" />
+                <ToggleSwitch IsChecked="{Binding Force}" OnContent="Force" OffContent="Force" ToolTip.Tip="Clean even if browsers or IDEs are running" />
+              </StackPanel>
+              <Button Grid.Column="3" Classes="primary" Command="{Binding CleanSelectedCommand}" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Width="16" Height="16" Foreground="White" Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+                  <TextBlock Text="{Binding SelectedText, StringFormat='Clean {0}'}" />
+                </StackPanel>
+              </Button>
+            </Grid>
+          </Border>
+
+          <Panel>
+            <!-- Empty state -->
+            <Border Classes="card" IsVisible="{Binding !HasResults}" Padding="48">
+              <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14" MaxWidth="520">
+                <Border Width="72" Height="72" CornerRadius="36" Background="{StaticResource AccentSoft}" HorizontalAlignment="Center">
+                  <PathIcon Width="32" Height="32" Foreground="{StaticResource Accent}"
+                            Data="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+                </Border>
+                <TextBlock Text="Find reclaimable space" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" />
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center" Classes="muted" LineHeight="20"
+                           Text="Scans your projects for build output (bin, obj, node_modules, target), plus package caches, IDE and browser caches, temp files, Docker and registry leftovers. Nothing is deleted until you confirm." />
+                <Button Classes="primary" Command="{Binding ScanCommand}" HorizontalAlignment="Center" Margin="0,8" AutomationProperties.Name="Start scan">
+                  <TextBlock Text="Start scan" />
+                </Button>
+                <Border CornerRadius="8" Background="#F6F7FB" Padding="14,10" Margin="0,8,0,0">
+                  <StackPanel Spacing="4">
+                    <TextBlock Classes="label" Text="PROJECT FOLDERS" />
+                    <TextBlock Classes="sub" Text="{Binding ScanRootsText}" />
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <!-- Results -->
+            <Border Classes="card" Padding="8,8,8,8" IsVisible="{Binding HasResults}">
+              <DockPanel>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="300,*,Auto" Margin="8,4,8,10">
+                  <TextBox Watermark="Filter by name or path" Text="{Binding FilterText}" />
+                  <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                    <TextBlock Classes="label" Text="SELECT" VerticalAlignment="Center" Margin="0,0,4,0" />
+                    <Button Classes="secondary" Content="Safe items" Command="{Binding SelectSafeCommand}" />
+                    <Button Classes="secondary" Content="Stale projects" Command="{Binding SelectStaleCommand}" />
+                    <Button Classes="secondary" Content="None" Command="{Binding SelectNoneCommand}" />
+                  </StackPanel>
+                </Grid>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,140,120,96" Margin="70,8,12,8">
+                  <TextBlock Classes="label" Text="ITEM" />
+                  <TextBlock Grid.Column="1" Classes="label" Text="SIZE" HorizontalAlignment="Right" />
+                  <TextBlock Grid.Column="2" Classes="label" Text="MODIFIED" Margin="20,0,0,0" />
+                  <TextBlock Grid.Column="3" Classes="label" Text="RISK" />
+                </Grid>
+                <Border DockPanel.Dock="Top" Height="1" Background="{StaticResource CardBorder}" Margin="8,0" />
+                <TreeView Classes="results" ItemsSource="{Binding Categories}" Margin="0,6,0,0"
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                  <TreeView.ItemTemplate>
+                    <TreeDataTemplate DataType="vm:ResultNode" ItemsSource="{Binding Children}">
+                      <Grid ColumnDefinitions="Auto,Auto,*,140,120,96" Background="Transparent" ToolTip.Tip="{Binding Path}" Margin="0,6,12,6">
+                        <Grid.ContextMenu>
+                          <ContextMenu>
+                            <MenuItem Header="Exclude permanently" Click="OnExclude" />
+                            <MenuItem Header="Open folder" Click="OnOpenFolder" />
+                            <MenuItem Header="Copy path" Click="OnCopyPath" />
+                          </ContextMenu>
+                        </Grid.ContextMenu>
+                        <CheckBox IsChecked="{Binding IsChecked}" MinWidth="0" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <Border Grid.Column="1" Width="34" Height="34" CornerRadius="9" Margin="0,0,12,0" IsVisible="{Binding IsCategory}"
+                                Background="{Binding Category, Converter={x:Static vm:Converters.CategoryTint}}">
+                          <PathIcon Width="16" Height="16" Data="{Binding Category, Converter={x:Static vm:Converters.CategoryIcon}}"
+                                    Foreground="{Binding Category, Converter={x:Static vm:Converters.CategoryBrush}}" />
+                        </Border>
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
+                          <TextBlock Text="{Binding DisplayTitle}" Classes.category="{Binding IsCategory}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Text="{Binding Subtitle}" Classes="sub" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="3" VerticalAlignment="Center" Spacing="6">
+                          <TextBlock Text="{Binding SizeText}" HorizontalAlignment="Right" FontWeight="SemiBold" Classes.category="{Binding IsCategory}" />
+                          <ProgressBar Classes="thin" IsVisible="{Binding IsCategory}" Value="{Binding Percent}" Maximum="100" Width="110" HorizontalAlignment="Right"
+                                       Foreground="{Binding Category, Converter={x:Static vm:Converters.CategoryBrush}}" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="4" Text="{Binding ModifiedText}" VerticalAlignment="Center" Margin="20,0,0,0" FontSize="12"
+                                   Foreground="{Binding IsStale, Converter={x:Static vm:Converters.StaleBrush}}" />
+                        <Border Grid.Column="5" Classes="badge" IsVisible="{Binding HasRisk}"
+                                Background="{Binding RiskText, Converter={x:Static vm:Converters.RiskTint}}">
+                          <TextBlock Text="{Binding RiskText}" Foreground="{Binding RiskText, Converter={x:Static vm:Converters.RiskBrush}}" />
+                        </Border>
+                      </Grid>
+                    </TreeDataTemplate>
+                  </TreeView.ItemTemplate>
+                </TreeView>
+              </DockPanel>
+            </Border>
+          </Panel>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ===== Projects ===== -->
+      <TabItem>
+        <DockPanel Margin="32,28,32,24">
+          <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="pageTitle" Text="Projects" />
+            <TextBlock Classes="pageSub" Text="Projects with build artefacts. Stale projects are highlighted; excluded projects are never scanned again." />
+          </StackPanel>
+          <Border Classes="card" Padding="8">
+            <Panel>
+              <TextBlock IsVisible="{Binding !Projects.Count}" Classes="muted" HorizontalAlignment="Center" VerticalAlignment="Center"
+                         Text="Run a scan to list projects." />
+              <ListBox Classes="rows" ItemsSource="{Binding Projects}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate DataType="vm:ProjectRow">
+                    <Grid ColumnDefinitions="Auto,*,120,140,Auto">
+                      <Border Width="36" Height="36" CornerRadius="9" Background="{StaticResource AccentSoft}" Margin="0,0,14,0">
+                        <PathIcon Width="16" Height="16" Foreground="{StaticResource Accent}"
+                                  Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
+                      </Border>
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" />
+                          <Border Classes="badge" Background="#FEF3C7" IsVisible="{Binding IsStale}">
+                            <TextBlock Text="Stale" Foreground="#B45309" />
+                          </Border>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Root}" Classes="sub" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Types}" Classes="sub" />
+                      </StackPanel>
+                      <TextBlock Grid.Column="2" Text="{Binding SizeText}" FontWeight="SemiBold" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                      <StackPanel Grid.Column="3" VerticalAlignment="Center" Margin="20,0">
+                        <TextBlock Classes="label" Text="LAST CHANGE" />
+                        <TextBlock Text="{Binding ModifiedText}" Foreground="{Binding IsStale, Converter={x:Static vm:Converters.StaleBrush}}" />
+                      </StackPanel>
+                      <Button Grid.Column="4" Classes="secondary" Content="Exclude" Click="OnExcludeProject" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Panel>
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ===== Search ===== -->
+      <TabItem>
+        <DockPanel DataContext="{Binding Search}" x:DataType="vm:SearchViewModel" Margin="32,28,32,24">
+          <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="pageTitle" Text="File search" />
+            <TextBlock Classes="pageSub" Text="Find leftover, large or old files by name, pattern, size and date." />
+          </StackPanel>
+          <Border DockPanel.Dock="Top" Classes="card" Margin="0,0,0,16">
+            <StackPanel Spacing="12">
+              <Grid ColumnDefinitions="*,8,Auto">
+                <TextBox Watermark="Folders to search (separate with ;)" Text="{Binding Roots}" />
+                <Button Grid.Column="2" Classes="secondary browse" Content="Browse…" Click="OnBrowseSearch" />
+              </Grid>
+              <Grid ColumnDefinitions="*,12,*,12,*" RowDefinitions="Auto,12,Auto">
+                <TextBox Watermark="Name glob, e.g. *.log" Text="{Binding NamePattern}" />
+                <TextBox Grid.Column="2" Watermark="Regex on full path" Text="{Binding Regex}" />
+                <TextBox Grid.Column="4" Watermark="Extensions: .tmp, .bak" Text="{Binding Extensions}" />
+                <TextBox Grid.Row="2" Watermark="Min size, e.g. 10MB" Text="{Binding MinSize}" />
+                <TextBox Grid.Row="2" Grid.Column="2" Watermark="Max size, e.g. 1GB" Text="{Binding MaxSize}" />
+                <NumericUpDown Grid.Row="2" Grid.Column="4" Watermark="Older than (days)" Value="{Binding OlderThanDays}" Minimum="0" />
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto">
+                <ToggleSwitch IsChecked="{Binding TempFilesOnly}" OnContent="Only temp / leftover files (*.tmp, ~*, *.bak, *.dmp, ...)" OffContent="Only temp / leftover files (*.tmp, ~*, *.bak, *.dmp, ...)" />
+                <Button Grid.Column="1" Classes="primary" Content="Search" Command="{Binding RunCommand}" />
+              </Grid>
+              <TextBlock Classes="sub" Text="{Binding PresetHint}" TextWrapping="Wrap" IsVisible="{Binding TempFilesOnly}" />
+            </StackPanel>
+          </Border>
+          <Border DockPanel.Dock="Bottom" Classes="card" Padding="20,12" Margin="0,16,0,0">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="{Binding Summary}" VerticalAlignment="Center" FontWeight="SemiBold" />
+              <Button Grid.Column="1" Classes="secondary" Content="Delete selected" Command="{Binding DeleteSelectedCommand}" />
+            </Grid>
+          </Border>
+          <Border Classes="card" Padding="8">
+            <ListBox Classes="rows" ItemsSource="{Binding Results}">
+              <ListBox.ItemTemplate>
+                <DataTemplate DataType="vm:SelectableFinding">
+                  <Grid ColumnDefinitions="Auto,*,110,150">
+                    <CheckBox IsChecked="{Binding IsChecked}" MinWidth="0" Margin="0,0,8,0" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Finding.Name}" FontWeight="Medium" />
+                      <TextBlock Text="{Binding Finding.Path}" Classes="sub" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding SizeText}" FontWeight="SemiBold" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="{Binding ModifiedText}" Classes="muted" Margin="20,0,0,0" VerticalAlignment="Center" />
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ===== Duplicates ===== -->
+      <TabItem>
+        <DockPanel DataContext="{Binding Duplicates}" x:DataType="vm:DuplicatesViewModel" Margin="32,28,32,24">
+          <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="pageTitle" Text="Duplicates" />
+            <TextBlock Classes="pageSub" Text="Identical files compared by content. The oldest copy is kept by default." />
+          </StackPanel>
+          <Border DockPanel.Dock="Top" Classes="card" Margin="0,0,0,16">
+            <Grid ColumnDefinitions="*,8,Auto,12,140,12,Auto">
+              <TextBox Watermark="Folders to compare (separate with ;)" Text="{Binding Roots}" />
+              <Button Grid.Column="2" Classes="secondary" Content="Browse…" Click="OnBrowseDuplicates" />
+              <TextBox Grid.Column="4" Watermark="Min size" Text="{Binding MinSize}" />
+              <Button Grid.Column="6" Classes="primary" Content="Find duplicates" Command="{Binding FindCommand}" />
+            </Grid>
+          </Border>
+          <Border DockPanel.Dock="Bottom" Classes="card" Padding="20,12" Margin="0,16,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <ProgressBar Classes="thin" Width="80" IsIndeterminate="True" IsVisible="{Binding IsBusy}" Margin="0,0,12,0" />
+              <TextBlock Grid.Column="1" Text="{Binding Summary}" VerticalAlignment="Center" FontWeight="SemiBold" />
+              <Button Grid.Column="2" Classes="secondary" Content="Delete selected" Command="{Binding DeleteSelectedCommand}" />
+            </Grid>
+          </Border>
+          <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Groups}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:DuplicateGroupViewModel">
+                  <Border Classes="card" Padding="16,12" Margin="0,0,0,10">
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="{Binding Header}" Classes="sectionTitle" />
+                      <ItemsControl ItemsSource="{Binding Files}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate DataType="vm:SelectableFinding">
+                            <Grid ColumnDefinitions="Auto,*,150" Margin="0,3">
+                              <CheckBox IsChecked="{Binding IsChecked}" MinWidth="0" Margin="0,0,8,0" />
+                              <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Finding.Path}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding Finding.Note}" Classes="sub" TextTrimming="CharacterEllipsis" />
+                              </StackPanel>
+                              <TextBlock Grid.Column="2" Text="{Binding ModifiedText}" Classes="muted" VerticalAlignment="Center" Margin="20,0,0,0" />
+                            </Grid>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ===== Disk usage ===== -->
+      <TabItem>
+        <DockPanel DataContext="{Binding DiskUsage}" x:DataType="vm:DiskUsageViewModel" Margin="32,28,32,24">
+          <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="pageTitle" Text="Disk usage" />
+            <TextBlock Classes="pageSub" Text="Visualise where space goes. Click a tile to drill in." />
+          </StackPanel>
+          <Border DockPanel.Dock="Top" Classes="card" Margin="0,0,0,16">
+            <Grid ColumnDefinitions="*,8,Auto,12,Auto,8,Auto">
+              <TextBox Text="{Binding Path}" />
+              <Button Grid.Column="2" Classes="secondary" Content="Browse…" Click="OnBrowseDiskUsage" />
+              <Button Grid.Column="4" Classes="primary" Content="Analyze" Command="{Binding AnalyzeCommand}" />
+              <Button Grid.Column="6" Classes="secondary" Content="Up" Command="{Binding UpCommand}" />
+            </Grid>
+          </Border>
+          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10" Margin="0,12,0,0">
+            <ProgressBar Classes="thin" Width="80" IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+            <TextBlock Text="{Binding Summary}" Classes="muted" />
+          </StackPanel>
+          <Border DockPanel.Dock="Right" Classes="card" Width="320" Padding="8" Margin="16,0,0,0">
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Top" Classes="label" Text="LARGEST ITEMS" Margin="12,8" />
+              <ListBox Classes="rows" ItemsSource="{Binding Largest}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate DataType="du:SizeNode">
+                    <Grid ColumnDefinitions="*,90">
+                      <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Grid.Column="1" Text="{Binding Size, Converter={x:Static vm:Converters.Bytes}}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+                    </Grid>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </DockPanel>
+          </Border>
+          <Border Classes="card" Padding="6" ClipToBounds="True">
+            <ctl:TreemapControl x:Name="Treemap" Node="{Binding Current}" />
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ===== History ===== -->
+      <TabItem>
+        <DockPanel DataContext="{Binding History}" x:DataType="vm:HistoryViewModel" Margin="32,28,32,24">
+          <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,20">
+            <TextBlock Classes="pageTitle" Text="History" />
+            <TextBlock Classes="pageSub" Text="{Binding Total}" />
+          </StackPanel>
+          <Border DockPanel.Dock="Right" Classes="card" Width="300" Margin="16,0,0,0">
+            <StackPanel Spacing="10">
+              <TextBlock Classes="label" Text="FREED BY CATEGORY" />
+              <ItemsControl ItemsSource="{Binding ByCategory}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <TextBlock Text="{Binding}" Margin="0,4" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+          <Border Classes="card" Padding="8">
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Top" Classes="label" Text="CLEANUP RUNS" Margin="12,8" />
+              <ListBox Classes="rows" ItemsSource="{Binding Runs}" FontFamily="Cascadia Mono,Consolas,monospace" />
+            </DockPanel>
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ===== Settings ===== -->
+      <TabItem>
+        <ScrollViewer DataContext="{Binding Settings}" x:DataType="vm:SettingsViewModel">
+          <StackPanel Margin="32,28,32,24" Spacing="16" MaxWidth="860" HorizontalAlignment="Left">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="pageTitle" Text="Settings" />
+              <TextBlock Classes="pageSub" Text="Configure what gets scanned and how cleanup behaves." />
+            </StackPanel>
+
+            <Border Classes="card">
+              <StackPanel Spacing="10">
+                <TextBlock Classes="sectionTitle" Text="Project folders" />
+                <TextBlock Classes="sub" Text="One folder per line. If empty: ~/source, ~/repos, ~/projects, ~/dev, ~/src, ~/code." />
+                <TextBox Text="{Binding ProjectRoots}" AcceptsReturn="True" Height="110" VerticalContentAlignment="Top" />
+                <Button Classes="secondary" Content="Add folder…" Click="OnBrowseProjectRoot" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+              <StackPanel Spacing="14">
+                <TextBlock Classes="sectionTitle" Text="Behaviour" />
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel>
+                    <TextBlock Text="Stale project threshold" FontWeight="Medium" />
+                    <TextBlock Classes="sub" Text="Projects not modified for this many days are marked stale." />
+                  </StackPanel>
+                  <NumericUpDown Grid.Column="1" Value="{Binding StaleDays}" Minimum="1" Maximum="3650" Width="150" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel>
+                    <TextBlock Text="Parallel scans" FontWeight="Medium" />
+                    <TextBlock Classes="sub" Text="How many scanners run at the same time." />
+                  </StackPanel>
+                  <NumericUpDown Grid.Column="1" Value="{Binding MaxParallelism}" Minimum="1" Maximum="32" Width="150" />
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel>
+                    <TextBlock Text="Delete permanently" FontWeight="Medium" />
+                    <TextBlock Classes="sub" Text="Skip the Recycle Bin. Faster, but cannot be undone." />
+                  </StackPanel>
+                  <ToggleSwitch Grid.Column="1" IsChecked="{Binding PermanentDelete}" OnContent="" OffContent="" />
+                </Grid>
+              </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <Button Classes="primary" Content="Save settings" Command="{Binding SaveCommand}" />
+              <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Foreground="{StaticResource Success}" />
+            </StackPanel>
+
+            <Border Classes="card">
+              <StackPanel Spacing="10">
+                <TextBlock Classes="sectionTitle" Text="Exclusions" />
+                <TextBlock Classes="sub" Text="These paths are never scanned or cleaned. Add them from the Cleanup or Projects page." />
+                <ItemsControl ItemsSource="{Binding Exclusions}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="p:ExclusionEntry">
+                      <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                        <TextBlock Text="{Binding Pattern}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <Button Grid.Column="1" Classes="secondary" Content="Remove"
+                                Command="{Binding $parent[ItemsControl].((vm:SettingsViewModel)DataContext).RemoveExclusionCommand}"
+                                CommandParameter="{Binding}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="sectionTitle" Text="Data" />
+                <TextBlock Classes="sub" Text="{Binding DataFolder, StringFormat='Data folder: {0}'}" />
+                <TextBlock Classes="sub" Text="{Binding RulesFolder, StringFormat='Custom rules (*.json): {0}'}" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </Grid>
+</Window>
