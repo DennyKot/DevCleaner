@@ -1,0 +1,25 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="DevCleaner"
+           Manufacturer="DevCleaner"
+           Version="$(Version)"
+           UpgradeCode="6E0F2B4A-3C1D-4F7E-9A52-8B1D7C3E4F10"
+           Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of DevCleaner is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+    <Icon Id="AppIcon" SourceFile="..\src\DevCleaner.Gui\Assets\devcleaner.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="DevCleaner">
+        <Files Include="$(PublishDir)\**" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Name="DevCleaner" Target="[INSTALLFOLDER]DevCleaner.exe" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\DevCleaner" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+  </Package>
+</Wix>
