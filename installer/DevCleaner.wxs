@@ -6,7 +6,7 @@
            Scope="perMachine">
     <MajorUpgrade DowngradeErrorMessage="A newer version of DevCleaner is already installed." />
     <MediaTemplate EmbedCab="yes" />
-    <Icon Id="AppIcon" SourceFile="..\src\DevCleaner.Gui\Assets\devcleaner.ico" />
+    <Icon Id="AppIcon" SourceFile="$(sys.SOURCEFILEDIR)..\src\DevCleaner.Gui\Assets\devcleaner.ico" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon" />
 
     <StandardDirectory Id="ProgramFiles64Folder">
