@@ -123,8 +123,8 @@
               </StackPanel>
               <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="24" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,24,0">
                 <ToggleSwitch IsChecked="{Binding DryRun}" OnContent="Dry run" OffContent="Dry run" ToolTip.Tip="Only report what would be removed" />
-                <CheckBox IsChecked="{Binding PermanentDelete}" Content="Delete permanently" AutomationProperties.Name="Delete permanently" ToolTip.Tip="Unchecked: move items to the Recycle Bin" />
                 <ToggleSwitch IsChecked="{Binding Force}" OnContent="Force" OffContent="Force" ToolTip.Tip="Clean even if browsers or IDEs are running" />
+                <CheckBox IsChecked="{Binding PermanentDelete}" Content="Delete permanently" AutomationProperties.Name="Delete permanently" ToolTip.Tip="Unchecked: move items to the Recycle Bin" />
               </StackPanel>
               <Button Grid.Column="3" Classes="primary" Command="{Binding CleanSelectedCommand}" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" Spacing="8">

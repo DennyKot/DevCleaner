@@ -13,19 +13,19 @@
   { "id": "linux-thumbnails", "name": "Thumbnail cache", "category": "SystemTemp", "risk": "Safe", "os": [ "Linux" ], "paths": [ "~/.cache/thumbnails" ], "contentsOnly": true },
 
   // ---------- Browsers (cache only, never profile data) ----------
-  { "id": "chrome-cache", "name": "Google Chrome cache", "category": "Browsers", "risk": "Safe", "os": [ "Windows" ], "processes": [ "chrome" ], "contentsOnly": true,
+  { "id": "chrome-cache", "name": "Google Chrome cache", "category": "Browsers", "risk": "Safe", "note": "Cache only: cookies, passwords and sessions are untouched (no logouts)", "os": [ "Windows" ], "processes": [ "chrome" ], "contentsOnly": true,
     "paths": [ "{localappdata}\\Google\\Chrome\\User Data\\*\\Cache", "{localappdata}\\Google\\Chrome\\User Data\\*\\Code Cache", "{localappdata}\\Google\\Chrome\\User Data\\*\\GPUCache", "{localappdata}\\Google\\Chrome\\User Data\\ShaderCache", "{localappdata}\\Google\\Chrome\\User Data\\GrShaderCache" ] },
-  { "id": "edge-cache", "name": "Microsoft Edge cache", "category": "Browsers", "risk": "Safe", "os": [ "Windows" ], "processes": [ "msedge" ], "contentsOnly": true,
+  { "id": "edge-cache", "name": "Microsoft Edge cache", "category": "Browsers", "risk": "Safe", "note": "Cache only: cookies, passwords and sessions are untouched (no logouts)", "os": [ "Windows" ], "processes": [ "msedge" ], "contentsOnly": true,
     "paths": [ "{localappdata}\\Microsoft\\Edge\\User Data\\*\\Cache", "{localappdata}\\Microsoft\\Edge\\User Data\\*\\Code Cache", "{localappdata}\\Microsoft\\Edge\\User Data\\*\\GPUCache", "{localappdata}\\Microsoft\\Edge\\User Data\\ShaderCache", "{localappdata}\\Microsoft\\Edge\\User Data\\GrShaderCache" ] },
-  { "id": "brave-cache", "name": "Brave cache", "category": "Browsers", "risk": "Safe", "os": [ "Windows" ], "processes": [ "brave" ], "contentsOnly": true,
+  { "id": "brave-cache", "name": "Brave cache", "category": "Browsers", "risk": "Safe", "note": "Cache only: cookies, passwords and sessions are untouched (no logouts)", "os": [ "Windows" ], "processes": [ "brave" ], "contentsOnly": true,
     "paths": [ "{localappdata}\\BraveSoftware\\Brave-Browser\\User Data\\*\\Cache", "{localappdata}\\BraveSoftware\\Brave-Browser\\User Data\\*\\Code Cache", "{localappdata}\\BraveSoftware\\Brave-Browser\\User Data\\*\\GPUCache" ] },
-  { "id": "opera-cache", "name": "Opera cache", "category": "Browsers", "risk": "Safe", "os": [ "Windows" ], "processes": [ "opera" ], "contentsOnly": true,
+  { "id": "opera-cache", "name": "Opera cache", "category": "Browsers", "risk": "Safe", "note": "Cache only: cookies, passwords and sessions are untouched (no logouts)", "os": [ "Windows" ], "processes": [ "opera" ], "contentsOnly": true,
     "paths": [ "{localappdata}\\Opera Software\\*\\Cache" ] },
-  { "id": "firefox-cache", "name": "Firefox cache", "category": "Browsers", "risk": "Safe", "processes": [ "firefox" ], "contentsOnly": true,
+  { "id": "firefox-cache", "name": "Firefox cache", "category": "Browsers", "risk": "Safe", "note": "Cache only: cookies, passwords and sessions are untouched (no logouts)", "processes": [ "firefox" ], "contentsOnly": true,
     "paths": [ "{localappdata}\\Mozilla\\Firefox\\Profiles\\*\\cache2", "~/.cache/mozilla/firefox/*/cache2", "~/Library/Caches/Firefox/Profiles/*/cache2" ] },
-  { "id": "chrome-cache-unix", "name": "Google Chrome cache", "category": "Browsers", "risk": "Safe", "os": [ "Linux", "MacOS" ], "processes": [ "chrome", "Google Chrome" ], "contentsOnly": true,
+  { "id": "chrome-cache-unix", "name": "Google Chrome cache", "category": "Browsers", "risk": "Safe", "note": "Cache only: cookies, passwords and sessions are untouched (no logouts)", "os": [ "Linux", "MacOS" ], "processes": [ "chrome", "Google Chrome" ], "contentsOnly": true,
     "paths": [ "~/.cache/google-chrome/*/Cache", "~/.cache/google-chrome/*/Code Cache", "~/Library/Caches/Google/Chrome/*/Cache" ] },
-  { "id": "inet-cache", "name": "Windows internet cache (WebView/IE)", "category": "Browsers", "risk": "Safe", "os": [ "Windows" ], "contentsOnly": true,
+  { "id": "inet-cache", "name": "Windows internet cache (WebView/IE)", "category": "Browsers", "risk": "Safe", "note": "Cache only: cookies, passwords and sessions are untouched (no logouts)", "os": [ "Windows" ], "contentsOnly": true,
     "paths": [ "{localappdata}\\Microsoft\\Windows\\INetCache" ] },
 
   // ---------- IDEs ----------

@@ -62,6 +62,34 @@ public sealed class CoreTests : IDisposable
     }
 
     [Fact]
+    public void ProjectProvider_GroupsBySolutionAndMonorepoRoot_WithinRepo()
+    {
+        _t.File(@"sln\App.sln", 10);
+        _t.File(@"sln\src\A\A.csproj", 10);
+        _t.File(@"sln\src\A\bin\a.dll", 100);
+        _t.File(@"sln\src\B\B.csproj", 10);
+        _t.File(@"sln\src\B\obj\b.json", 100);
+        _t.File(@"sln\web\package.json", 10);
+        _t.File(@"sln\web\node_modules\x.js", 100);
+        _t.File(@"sln\vendor\Lib\.git", 10);
+        _t.File(@"sln\vendor\Lib\Lib.csproj", 10);
+        _t.File(@"sln\vendor\Lib\bin\l.dll", 100);
+        _t.File(@"mono\package.json", 10);
+        _t.File(@"mono\packages\p1\package.json", 10);
+        _t.File(@"mono\packages\p1\node_modules\y.js", 100);
+
+        var findings = Scan(new ProjectRuleProvider(RuleLoader.LoadBuiltIn()), PathMatcher.Empty);
+
+        var a = findings.Single(f => f.Path == _t.P(@"sln\src\A\bin"));
+        Assert.Equal(_t.P("sln"), a.ProjectRoot);
+        Assert.EndsWith(Path.Combine("src", "A", "bin"), a.Name, StringComparison.Ordinal);
+        Assert.Equal(_t.P("sln"), findings.Single(f => f.Path == _t.P(@"sln\src\B\obj")).ProjectRoot);
+        Assert.Equal(_t.P(@"sln\web"), findings.Single(f => f.Path == _t.P(@"sln\web\node_modules")).ProjectRoot);
+        Assert.Equal(_t.P(@"sln\vendor\Lib"), findings.Single(f => f.Path == _t.P(@"sln\vendor\Lib\bin")).ProjectRoot);
+        Assert.Equal(_t.P("mono"), findings.Single(f => f.Path == _t.P(@"mono\packages\p1\node_modules")).ProjectRoot);
+    }
+
+    [Fact]
     public void ProjectProvider_FindsGameEngineAndTerraformArtefacts()
     {
         _t.File(@"game\ProjectSettings\ProjectVersion.txt", 10);

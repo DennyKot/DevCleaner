@@ -339,7 +339,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var rows = findings.Where(f => f.ProjectRoot is not null)
             .GroupBy(f => f.ProjectRoot!)
-            .Select(g => new ProjectRow(g.Key, string.Join(", ", g.Select(f => System.IO.Path.GetFileName(f.Path))), g.Sum(f => f.SizeBytes),
+            .Select(g => new ProjectRow(g.Key, string.Join(", ", g.Select(f => System.IO.Path.GetFileName(f.Path)).Distinct(OsInfo.PathComparer)), g.Sum(f => f.SizeBytes),
                 g.First().ProjectLastModifiedUtc, g.First().IsStale(staleDays)))
             .OrderByDescending(r => r.Size);
         foreach (var r in rows)

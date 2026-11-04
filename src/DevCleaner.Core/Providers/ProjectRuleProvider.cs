@@ -17,7 +17,8 @@ public sealed class ProjectRuleProvider(IEnumerable<CleanupRule> rules) : IClean
     public string Name => "Project artefacts";
     public IReadOnlyCollection<Category> Categories => _rules.Select(r => r.Category).Distinct().ToArray();
 
-    private sealed record Candidate(string Dir, CleanupRule Rule, string Target, string Path, IReadOnlyList<CleanupRule> Matched);
+    /// <param name="Group">Outermost ancestor with a marker of the same category in the same repo (e.g. the .sln folder or monorepo root).</param>
+    private sealed record Candidate(string Group, CleanupRule Rule, string Target, string Path);
 
     public IEnumerable<Finding> Scan(ScanContext context, CancellationToken ct)
     {
@@ -40,19 +41,20 @@ public sealed class ProjectRuleProvider(IEnumerable<CleanupRule> rules) : IClean
                         var stats = FsUtil.Measure(c.Path, ct);
                         if (stats.Size == 0)
                             return;
-                        var modified = projectDates.GetOrAdd(c.Dir, d => new Lazy<DateTime?>(() => ProjectLastModified(d, c.Matched, ct))).Value;
+                        var modified = projectDates.GetOrAdd($"{c.Rule.Category}|{c.Group}", _ => new Lazy<DateTime?>(() =>
+                            ProjectLastModified(c.Group, active.Where(r => r.Category == c.Rule.Category), ct))).Value;
                         output.Add(new Finding
                         {
                             ProviderId = c.Rule.Id,
                             Category = c.Rule.Category,
-                            Name = $"{c.Rule.Name}: {c.Target}",
+                            Name = $"{c.Rule.Name}: {Path.GetRelativePath(c.Group, c.Path)}",
                             Path = c.Path,
                             Kind = FindingKind.Directory,
                             SizeBytes = stats.Size,
                             FileCount = stats.FileCount,
                             LastModifiedUtc = stats.LastModifiedUtc,
                             Risk = c.Rule.Risk,
-                            ProjectRoot = c.Dir,
+                            ProjectRoot = c.Group,
                             ProjectLastModifiedUtc = modified,
                             Note = c.Rule.Note,
                             Processes = c.Rule.Processes,
@@ -72,21 +74,27 @@ public sealed class ProjectRuleProvider(IEnumerable<CleanupRule> rules) : IClean
 
     private static IEnumerable<Candidate> Walk(ScanContext context, CleanupRule[] active, CancellationToken ct)
     {
-        var stack = new Stack<(string Dir, int Depth)>();
+        var stack = new Stack<(string Dir, int Depth, Dictionary<Category, string> Groups)>();
         foreach (var root in context.Options.ProjectRoots.Where(Directory.Exists))
-            stack.Push((Path.GetFullPath(root), 0));
+            stack.Push((Path.GetFullPath(root), 0, []));
 
         var visited = new HashSet<string>(OsInfo.PathComparer);
         while (stack.Count > 0)
         {
             ct.ThrowIfCancellationRequested();
-            var (dir, depth) = stack.Pop();
+            var (dir, depth, groups) = stack.Pop();
             if (!visited.Add(dir) || context.Exclusions.IsMatch(dir))
                 continue;
 
             var entries = FsUtil.SafeEntries(dir).ToList();
             var fileNames = entries.OfType<FileInfo>().Select(f => f.Name).ToList();
             var matched = active.Where(r => r.Markers.Any(m => MarkerMatches(dir, m, fileNames))).ToList();
+
+            // A nested repo (.git folder, or file for worktrees/submodules) starts its own groups.
+            if (entries.Any(e => e.Name == ".git"))
+                groups = [];
+            foreach (var category in matched.Select(r => r.Category).Where(c => !groups.ContainsKey(c)).Distinct().ToList())
+                groups = new Dictionary<Category, string>(groups) { [category] = dir };
 
             var skip = new HashSet<string>(AlwaysSkip, OsInfo.PathComparer);
             foreach (var rule in matched)
@@ -96,7 +104,7 @@ public sealed class ProjectRuleProvider(IEnumerable<CleanupRule> rules) : IClean
                     skip.Add(target);
                     var path = Path.Combine(dir, target);
                     if (Directory.Exists(path) && !context.Exclusions.IsMatch(path) && !FsUtil.IsReparsePoint(new DirectoryInfo(path)))
-                        yield return new Candidate(dir, rule, target, path, matched);
+                        yield return new Candidate(groups[rule.Category], rule, target, path);
                 }
             }
 
@@ -106,7 +114,7 @@ public sealed class ProjectRuleProvider(IEnumerable<CleanupRule> rules) : IClean
             foreach (var sub in entries.OfType<DirectoryInfo>())
             {
                 if (!skip.Contains(sub.Name) && !FsUtil.IsReparsePoint(sub))
-                    stack.Push((sub.FullName, depth + 1));
+                    stack.Push((sub.FullName, depth + 1, groups));
             }
         }
     }
