@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -60,6 +61,30 @@ public sealed partial class MainWindow : Window
     private async void OnCopyPath(object? sender, RoutedEventArgs e)
     {
         if (NodeOf(sender)?.Path is { } path && Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(path);
+    }
+
+    private static string? DuplicatePathOf(object? sender) =>
+        ((sender as Control)?.DataContext as SelectableFinding)?.Finding.Path;
+
+    private async void OnOpenDuplicateLocation(object? sender, RoutedEventArgs e)
+    {
+        if (DuplicatePathOf(sender) is not { } path)
+            return;
+        if (OperatingSystem.IsWindows() && File.Exists(path))
+        {
+            // Opens Explorer with the file pre-selected.
+            using var _ = Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{path}\"") { UseShellExecute = false });
+            return;
+        }
+        var dir = Path.GetDirectoryName(path);
+        if (dir is not null && Directory.Exists(dir))
+            await Launcher.LaunchDirectoryInfoAsync(new DirectoryInfo(dir));
+    }
+
+    private async void OnCopyDuplicatePath(object? sender, RoutedEventArgs e)
+    {
+        if (DuplicatePathOf(sender) is { } path && Clipboard is { } clipboard)
             await clipboard.SetTextAsync(path);
     }
 

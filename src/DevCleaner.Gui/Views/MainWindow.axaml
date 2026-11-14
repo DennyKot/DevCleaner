@@ -350,13 +350,21 @@
                       <ItemsControl ItemsSource="{Binding Files}">
                         <ItemsControl.ItemTemplate>
                           <DataTemplate DataType="vm:SelectableFinding">
-                            <Grid ColumnDefinitions="Auto,*,150" Margin="0,3">
+                            <Grid ColumnDefinitions="Auto,*,150,Auto" Margin="0,3" Background="Transparent" ToolTip.Tip="{Binding Finding.Path}">
+                              <Grid.ContextMenu>
+                                <ContextMenu>
+                                  <MenuItem Header="Open file location" Click="OnOpenDuplicateLocation" />
+                                  <MenuItem Header="Copy path" Click="OnCopyDuplicatePath" />
+                                </ContextMenu>
+                              </Grid.ContextMenu>
                               <CheckBox IsChecked="{Binding IsChecked}" MinWidth="0" Margin="0,0,8,0" />
                               <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Finding.Path}" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding Finding.Note}" Classes="sub" TextTrimming="CharacterEllipsis" />
                               </StackPanel>
                               <TextBlock Grid.Column="2" Text="{Binding ModifiedText}" Classes="muted" VerticalAlignment="Center" Margin="20,0,0,0" />
+                              <Button Grid.Column="3" Classes="secondary" Content="Open folder" VerticalAlignment="Center"
+                                      AutomationProperties.Name="Open file location" Click="OnOpenDuplicateLocation" />
                             </Grid>
                           </DataTemplate>
                         </ItemsControl.ItemTemplate>
