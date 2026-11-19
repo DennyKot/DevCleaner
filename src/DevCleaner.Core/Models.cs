@@ -66,6 +66,9 @@ public sealed record Finding
     /// <summary>Process names that must not be running while this item is cleaned.</summary>
     public IReadOnlyList<string> Processes { get; init; } = [];
 
+    /// <summary>Sibling files deleted together with <see cref="Path"/> (e.g. an emulator's .ini pointer); already in <see cref="SizeBytes"/>.</summary>
+    public IReadOnlyList<string> Companions { get; init; } = [];
+
     public string Id => $"{Kind}:{Path}";
 
     public bool IsFileSystem => Kind is FindingKind.Directory or FindingKind.DirectoryContents or FindingKind.File;

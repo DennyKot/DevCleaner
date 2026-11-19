@@ -120,6 +120,43 @@ public sealed class CoreTests : IDisposable
         Assert.Equal(120, findings.Sum(f => f.SizeBytes));
     }
 
+    [Fact]
+    public void PathRuleProvider_Companions_AreSizedAndDeletedWithTheirItem()
+    {
+        _t.File(@"avd\Pixel.avd\userdata.img", 500);
+        _t.File(@"avd\Pixel.avd\snapshots\default\ram.bin", 300);
+        _t.File(@"avd\Pixel.ini", 20);
+        _t.File(@"avd\Lonely.avd\data.img", 100);
+        var rule = new CleanupRule { Id = "avd", Name = "AVD", Category = Category.Ide, Paths = [_t.P(@"avd\*.avd")], Companions = ["{stem}.ini"] };
+
+        var findings = Scan(new PathRuleProvider([rule]), PathMatcher.Empty);
+
+        Assert.Equal(2, findings.Count);
+        var pixel = Assert.Single(findings, f => f.Path == _t.P(@"avd\Pixel.avd"));
+        Assert.Equal(FindingKind.Directory, pixel.Kind);
+        Assert.Equal([_t.P(@"avd\Pixel.ini")], pixel.Companions);
+        Assert.Equal(820, pixel.SizeBytes);
+        Assert.Empty(Assert.Single(findings, f => f.Path == _t.P(@"avd\Lonely.avd")).Companions);
+
+        var report = new CleanEngine(new FakePlatform(), [], PathMatcher.Empty).Clean([pixel], new CleanOptions { Permanent = true });
+
+        Assert.Equal(CleanStatus.Cleaned, report.Items[0].Status);
+        Assert.False(Directory.Exists(_t.P(@"avd\Pixel.avd")));
+        Assert.False(File.Exists(_t.P(@"avd\Pixel.ini")));
+        Assert.True(Directory.Exists(_t.P(@"avd\Lonely.avd")));
+    }
+
+    [Theory]
+    [InlineData("{stem}.ini", true)]
+    [InlineData(@"..\x.ini", false)]
+    [InlineData("sub/x.ini", false)]
+    [InlineData("*.ini", false)]
+    public void RuleLoader_ValidatesCompanions(string companion, bool valid)
+    {
+        var rule = new CleanupRule { Id = "r", Name = "R", Paths = ["~/x/*.avd"], Companions = [companion] };
+        Assert.Equal(valid, RuleLoader.Validate(rule).Count == 0);
+    }
+
     [Theory]
     [InlineData(@"C:\", false)]
     [InlineData(@"C:\Windows", false)]

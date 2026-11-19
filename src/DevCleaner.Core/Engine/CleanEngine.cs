@@ -118,6 +118,7 @@ public sealed class CleanEngine(IPlatformServices platform, IReadOnlyList<IClean
         var targets = f.Kind == FindingKind.DirectoryContents
             ? FsUtil.SafeEntries(f.Path).Select(e => e.FullName).Where(p => SafetyGuard.IsSafeToDelete(p, out _)).ToList()
             : [f.Path];
+        targets.AddRange(f.Companions.Where(c => File.Exists(c) && !exclusions.IsMatch(c) && SafetyGuard.IsSafeToDelete(c, out _)));
 
         var failures = o.Permanent ? DeletePermanent(targets, onStep, ct) : Recycle(targets, onStep, ct);
 

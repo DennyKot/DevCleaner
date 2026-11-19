@@ -19,6 +19,13 @@ public sealed record CleanupRule
     public string[] Paths { get; init; } = [];
     public bool ContentsOnly { get; init; }
     public string[] Processes { get; init; } = [];
+
+    /// <summary>
+    /// Path rules only: sibling file names deleted together with each match. <c>{stem}</c> is the match's
+    /// name without extension, e.g. <c>"{stem}.ini"</c> next to <c>Pixel.avd</c> is <c>Pixel.ini</c>.
+    /// </summary>
+    public string[] Companions { get; init; } = [];
+
     public string? Note { get; init; }
 
     [JsonIgnore]
@@ -94,6 +101,14 @@ public static class RuleLoader
         {
             if (p.Contains("..", StringComparison.Ordinal))
                 errors.Add($"path '{p}' must not contain '..'");
+        }
+
+        if (r.Companions.Length > 0 && (r.IsProjectRule || r.ContentsOnly))
+            errors.Add("companions are only allowed on path rules without contentsOnly");
+        foreach (var c in r.Companions)
+        {
+            if (string.IsNullOrWhiteSpace(c) || c.IndexOfAny(['/', '\\', '*', '?']) >= 0 || c.Contains("..", StringComparison.Ordinal))
+                errors.Add($"companion '{c}' must be a plain file name");
         }
 
         return errors;

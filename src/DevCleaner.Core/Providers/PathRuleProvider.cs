@@ -33,6 +33,10 @@ public sealed class PathRuleProvider(IEnumerable<CleanupRule> rules) : ICleanupP
                     if (stats.Size == 0)
                         continue;
 
+                    var companions = Companions(rule, path, context);
+                    if (companions.Length > 0)
+                        stats = stats with { Size = stats.Size + companions.Sum(c => new FileInfo(c).Length), FileCount = stats.FileCount + companions.Length };
+
                     var isFile = File.Exists(path);
                     yield return new Finding
                     {
@@ -47,9 +51,24 @@ public sealed class PathRuleProvider(IEnumerable<CleanupRule> rules) : ICleanupP
                         Risk = rule.Risk,
                         Note = rule.Note,
                         Processes = rule.Processes,
+                        Companions = companions,
                     };
                 }
             }
         }
+    }
+
+    /// <summary>Existing, non-excluded plain files named by the rule's companion patterns, next to <paramref name="path"/>.</summary>
+    private static string[] Companions(CleanupRule rule, string path, ScanContext context)
+    {
+        if (rule.Companions.Length == 0 || Path.GetDirectoryName(path) is not { } dir)
+            return [];
+
+        var stem = Path.GetFileNameWithoutExtension(path);
+        return rule.Companions
+            .Select(c => Path.Combine(dir, c.Replace("{stem}", stem, StringComparison.OrdinalIgnoreCase)))
+            .Where(p => !OsInfo.PathComparer.Equals(p, path) && File.Exists(p)
+                && !new FileInfo(p).Attributes.HasFlag(FileAttributes.ReparsePoint) && !context.Exclusions.IsMatch(p))
+            .ToArray();
     }
 }
