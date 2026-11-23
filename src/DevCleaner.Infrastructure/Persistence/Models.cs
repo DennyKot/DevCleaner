@@ -39,6 +39,13 @@ public sealed class LifetimeStats
     public Dictionary<Category, long> ByCategory { get; set; } = [];
 }
 
+/// <summary>Image versions written by DevCleaner (see ImageScanner.OptimizedKey); skipped by later image scans.</summary>
+public sealed class OptimizedImageList
+{
+    public int Version { get; set; } = 1;
+    public List<string> Keys { get; set; } = [];
+}
+
 public sealed record HistoryItem(Category Category, string Name, string Path, CleanStatus Status, long BytesFreed, string? Message);
 
 public sealed record HistoryRun(DateTime StartedUtc, DateTime FinishedUtc, long TotalBytesFreed, List<HistoryItem> Items);

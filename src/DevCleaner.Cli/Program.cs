@@ -9,6 +9,7 @@ root.Subcommands.Add(ScanCommands.Scan(host));
 root.Subcommands.Add(ScanCommands.Clean(host));
 root.Subcommands.Add(ToolCommands.Search(host));
 root.Subcommands.Add(ToolCommands.Dupes(host));
+root.Subcommands.Add(ImageCommands.Images(host));
 root.Subcommands.Add(ToolCommands.Usage());
 root.Subcommands.Add(ConfigCommands.Exclude(host));
 root.Subcommands.Add(ConfigCommands.Roots(host));

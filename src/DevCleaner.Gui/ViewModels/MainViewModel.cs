@@ -19,6 +19,7 @@ public sealed partial class MainViewModel : ObservableObject
         _host = host;
         Search = new SearchViewModel(host, this);
         Duplicates = new DuplicatesViewModel(host, this);
+        Images = new ImagesViewModel(host, this);
         DiskUsage = new DiskUsageViewModel();
         History = new HistoryViewModel(host);
         Settings = new SettingsViewModel(host);
@@ -31,6 +32,7 @@ public sealed partial class MainViewModel : ObservableObject
 
     public SearchViewModel Search { get; }
     public DuplicatesViewModel Duplicates { get; }
+    public ImagesViewModel Images { get; }
     public DiskUsageViewModel DiskUsage { get; }
     public HistoryViewModel History { get; }
     public SettingsViewModel Settings { get; }
@@ -354,6 +356,13 @@ public sealed partial class MainViewModel : ObservableObject
         ReclaimableText = Bytes.Format(total);
         FoundCount = $"{_leaves.Count} items in {Categories.Count} categories";
         SelectedText = Bytes.Format(Categories.SelectMany(c => c.CheckedFindings()).Sum(f => f.SizeBytes));
+    }
+
+    /// <summary>Refreshes the lifetime card and history after work done outside <see cref="CleanAsync"/>.</summary>
+    public void RefreshStats()
+    {
+        RefreshLifetime();
+        History.Refresh();
     }
 
     private void RefreshLifetime()

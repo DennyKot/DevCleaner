@@ -3,7 +3,7 @@
 DevCleaner: a .NET 10 tool that finds and safely cleans developer disk junk. Avalonia GUI + CLI over a shared core.
 
 ## Layout
-- `src/DevCleaner.Core` – engines, providers, rules, search, duplicates, disk usage. **No OS-specific APIs here.**
+- `src/DevCleaner.Core` – engines, providers, rules, search, duplicates, image compression (`Images/`: SkiaSharp + Magick.NET), disk usage. **No OS-specific APIs here.**
 - `src/DevCleaner.Platform.Windows` – Recycle Bin (P/Invoke), Restart Manager, registry. Assembly is `[SupportedOSPlatform("windows")]`; guard callers with `OperatingSystem.IsWindows()`.
 - `src/DevCleaner.Platform.Unix` – placeholder (no trash yet).
 - `src/DevCleaner.Infrastructure` – JSON persistence (`DataStore`) + composition root (`AppHost`).
@@ -25,6 +25,7 @@ dotnet run --project src\DevCleaner.Gui
 - Keep Avalonia ≥ 11.3.22 (older pulls a vulnerable `Tmds.DBus.Protocol`).
 - New cleanup targets go into `src/DevCleaner.Core/Rules/builtin-rules.json` (data, not code). Use `markers`+`targets` for project folders, `paths` for fixed locations.
 - New cleanup sources: implement `ICleanupProvider` (+ `ICustomCleaner` for non-file items) and register in `AppHost.Create`.
+- Image compression (Core/Images): SkiaSharp must stay on the version Avalonia ships (Directory.Packages.props). Decode with a null colour space so pixel values round-trip; JPEG quality is chosen by worst-1% SSIM. Replacing an original goes through ImageApplier → CleanEngine (never delete originals directly); savings are recorded via AppHost.CompressImages.
 - Git logic lives in `Core/Git/GitInspector` (shells out to `git`, cached). `ScanEngine` annotates every project finding with repo dirty state; `GitIgnoredProvider` reports only whole folders an ignore rule matches directly.
 - GUI uses compiled bindings: every template needs `x:DataType`. Keep `AutomationProperties.Name` on nav items/buttons (used by screenshot automation and screen readers).
 

@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <PackageReference Include="System.IO.Hashing" />
+    <PackageReference Include="SkiaSharp" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Rules\builtin-rules.json" LogicalName="DevCleaner.Core.builtin-rules.json" />

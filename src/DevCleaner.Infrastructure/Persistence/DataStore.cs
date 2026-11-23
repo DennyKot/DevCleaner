@@ -25,6 +25,8 @@ public sealed class DataStore : ICleanRecorder
     private string SettingsFile => Path.Combine(Root, "settings.json");
     private string ExclusionsFile => Path.Combine(Root, "exclusions.json");
     private string StatsFile => Path.Combine(Root, "stats.json");
+    private string OptimizedImagesFile => Path.Combine(Root, "optimized-images.json");
+    private const int MaxOptimizedImages = 200_000;
 
     public AppSettings LoadSettings() => JsonStore.Load<AppSettings>(SettingsFile);
 
@@ -58,6 +60,22 @@ public sealed class DataStore : ICleanRecorder
             if (removed)
                 JsonStore.Save(ExclusionsFile, list);
             return removed;
+        }
+    }
+
+    public HashSet<string> LoadOptimizedImages() =>
+        JsonStore.Load<OptimizedImageList>(OptimizedImagesFile).Keys.ToHashSet(OsInfo.PathComparer);
+
+    public void MarkImagesOptimized(IEnumerable<string> keys)
+    {
+        lock (_lock)
+        {
+            var list = JsonStore.Load<OptimizedImageList>(OptimizedImagesFile);
+            var known = list.Keys.ToHashSet(OsInfo.PathComparer);
+            list.Keys.AddRange(keys.Where(known.Add));
+            if (list.Keys.Count > MaxOptimizedImages)
+                list.Keys.RemoveRange(0, list.Keys.Count - MaxOptimizedImages);
+            JsonStore.Save(OptimizedImagesFile, list);
         }
     }
 

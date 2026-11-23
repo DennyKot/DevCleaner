@@ -27,7 +27,7 @@ jobs:
       - name: Publish GUI and CLI
         run: |
           dotnet publish src\DevCleaner.Gui -c Release -r win-x64 --self-contained -p:Version=${{ env.VERSION }} -o out\gui
-          dotnet publish src\DevCleaner.Cli -c Release -r win-x64 --self-contained -p:Version=${{ env.VERSION }} -p:PublishSingleFile=true -o out\cli
+          dotnet publish src\DevCleaner.Cli -c Release -r win-x64 --self-contained -p:Version=${{ env.VERSION }} -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out\cli
 
       - name: Package GUI with Velopack
         shell: pwsh

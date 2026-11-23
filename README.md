@@ -50,6 +50,7 @@ On the machine used for these screenshots DevCleaner found **130 GB** across 1,4
 - **Respects running apps** — browser and IDE caches are skipped while Chrome, Rider, VS Code etc. are running, and locked files are reported, not forced.
 - **Advanced file search** — glob, regex, extensions, size and age filters, plus a 50+ pattern "leftover files" preset (`*.tmp`, `*.dmp`, `*.crdownload`, `hs_err_pid*.log`, `*.pyc`, ...).
 - **Duplicate finder** — compares by content using a fast three-stage hash (size → 4 KB prefix → full xxHash64) and keeps the oldest copy.
+- **Image compression** — finds JPEG, PNG, BMP, TIFF and HEIC photos (old camera shots, scans, screenshots, iPhone pictures) that can be stored smaller without visible loss. Each photo gets the lowest quality that still passes a structural-similarity (SSIM) check against the original, including its worst areas. *Lossless only* mode changes no pixel at all: JPEGs are repacked (optimal Huffman tables, progressive), PNG/TIFF re-compressed (16-bit TIFFs keep their depth), BMP becomes PNG — all verified. Optionally convert to **WebP, AVIF or JPEG XL** for 30–60% more savings, with a clear warning about which apps can open them. Exif/GPS/XMP/ICC metadata, orientation, file dates and motion-photo videos are kept. Nothing is pre-selected: tick folders or single photos, compare original and result side by side (drag the divider, zoom to 100%), and see exactly how much each one saves. Originals go to the Recycle Bin, or keep them and write copies to another folder.
 - **Disk usage treemap** — see at a glance which folders are eating your drive and drill into them.
 - **Lifetime statistics** — how much you've freed in total, by category, with a log of every cleanup run.
 - **Custom rules** — add your own cleanup targets with a small JSON file. No recompiling.
@@ -118,6 +119,11 @@ devcleaner clean --dry-run -o preview.csv         # export the clean result; --f
 devcleaner search C:\work --temp-files --older-than-days 30
 devcleaner search D:\ --min-size 1GB --ext .iso .zip
 devcleaner dupes ~/Downloads ~/Documents --min-size 10MB
+devcleaner images ~/Pictures                      # estimate savings, changes nothing
+devcleaner images ~/Pictures --compress           # asks, then recycles originals
+devcleaner images D:\Scans --mode Smaller --output D:\Scans-small --compress   # keep originals
+devcleaner images ~/Pictures --mode Lossless --compress   # pixel-identical: JPEG repack, PNG/TIFF re-compress
+devcleaner images ~/Pictures --format Avif               # estimate AVIF conversion (also WebP, JpegXl, Jpeg)
 devcleaner usage C:\Users\me --depth 2
 
 devcleaner roots add C:\work                      # where to look for projects
@@ -159,12 +165,13 @@ DevCleaner deletes files, so it takes that seriously:
 - Registry keys are exported to `.reg` before deletion, and only two well-defined key families are touched.
 - Locked files are skipped and reported instead of forcing anything.
 - Git-ignored folders are only offered when the folder itself matches an ignore rule and contains no tracked files; repos with uncommitted changes are flagged *Caution*.
+- Image compression writes and re-reads the new file next to the original before the original is removed through the same clean engine (exclusions, guard, Recycle Bin by default in GUI and CLI). Lossless output is pixel-verified. CMYK/12-bit JPEGs, 16-bit PNGs, 32-bit/float TIFFs, cloud-only (online-only OneDrive) files and phone photos with HDR gain maps or depth maps are left alone; motion photos are only re-encoded as JPEG so their video survives.
 
 ## Architecture
 
 ```
 src/
-  DevCleaner.Core               scan & clean engines, rules, providers, search, duplicates, disk usage (no OS APIs)
+  DevCleaner.Core               scan & clean engines, rules, providers, search, duplicates, image compression, disk usage (no OS APIs)
   DevCleaner.Platform.Windows   Recycle Bin, Restart Manager lock detection, registry provider
   DevCleaner.Platform.Unix      Linux/macOS placeholder
   DevCleaner.Infrastructure     JSON settings/exclusions/stats/history + composition root

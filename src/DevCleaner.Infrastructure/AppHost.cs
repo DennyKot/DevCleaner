@@ -2,6 +2,7 @@ using DevCleaner.Core;
 using DevCleaner.Core.Abstractions;
 using DevCleaner.Core.Engine;
 using DevCleaner.Core.Git;
+using DevCleaner.Core.Images;
 using DevCleaner.Core.Providers;
 using DevCleaner.Core.Rules;
 using DevCleaner.Infrastructure.Persistence;
@@ -169,5 +170,48 @@ public sealed class AppHost
 
     public ScanEngine CreateScanEngine() => new(Providers, Git);
 
-    public CleanEngine CreateCleanEngine() => new(Platform, Providers, Store.ExclusionMatcher(), Store);
+    public CleanEngine CreateCleanEngine(bool record = true) => new(Platform, Providers, Store.ExclusionMatcher(), record ? Store : null);
+
+    /// <summary>Image scan options with the user's exclusions; skips image versions DevCleaner already wrote.</summary>
+    public ImageScanOptions CreateImageScanOptions(IReadOnlyList<string> roots, long minSize, bool includePng = true, bool includeBmp = true,
+        bool includeTiff = true, bool includeHeic = true)
+    {
+        var done = Store.LoadOptimizedImages();
+        return new ImageScanOptions
+        {
+            Roots = roots,
+            MinSize = minSize,
+            IncludePng = includePng,
+            IncludeBmp = includeBmp,
+            IncludeTiff = includeTiff,
+            IncludeHeic = includeHeic,
+            Exclusions = Store.ExclusionMatcher(),
+            Skip = done.Count == 0 ? null : f => done.Contains(ImageScanner.OptimizedKey(f.FullName, f.Length, f.LastWriteTimeUtc)),
+        };
+    }
+
+    /// <summary>
+    /// Compresses images; originals are removed through the clean engine. Savings are recorded in stats/history and the
+    /// written files are remembered so later scans skip them.
+    /// </summary>
+    public (List<ImageApplyResult> Results, CleanReport Report) CompressImages(IReadOnlyList<ImageCandidate> items, ImageApplyOptions options,
+        IProgress<ImageApplyProgress>? progress = null, CancellationToken ct = default)
+    {
+        var started = DateTime.UtcNow;
+        var results = ImageApplier.Apply(items, options, CreateCleanEngine(record: false), progress, ct);
+        var report = ImageApplier.ToReport(results, started, options);
+        if (options.DryRun)
+            return (results, report);
+
+        var written = results.Where(r => r.Status == ImageApplyStatus.Compressed && r.OutputPath is not null)
+            .Select(r => new FileInfo(r.OutputPath!))
+            .Where(f => f.Exists)
+            .Select(f => ImageScanner.OptimizedKey(f.FullName, f.Length, f.LastWriteTimeUtc))
+            .ToList();
+        if (written.Count > 0)
+            Store.MarkImagesOptimized(written);
+        if (options.Originals != ImageOriginalsMode.SaveCopies && report.Items.Count > 0)
+            Store.Record(report);
+        return (results, report);
+    }
 }

@@ -15,6 +15,7 @@ public enum Category
     Custom,
     Duplicates,
     GitIgnored,
+    Images,
 }
 
 public enum RiskLevel

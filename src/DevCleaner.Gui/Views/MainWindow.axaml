@@ -9,6 +9,17 @@
         Title="DevCleaner" Icon="/Assets/devcleaner.ico" Width="1320" Height="860" MinWidth="1000" MinHeight="640">
 
   <Window.Styles>
+    <Style Selector="Button.chevron">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.chevron:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="#E6E8EF" />
+    </Style>
     <Style Selector="TreeView.results TreeViewItem" x:DataType="vm:ResultNode">
       <Setter Property="IsVisible" Value="{Binding IsShown}" />
     </Style>
@@ -59,6 +70,12 @@
             <StackPanel Orientation="Horizontal" Spacing="12">
               <PathIcon Width="16" Height="16" Data="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
               <TextBlock Text="Duplicates" FontWeight="SemiBold" />
+            </StackPanel>
+          </ListBoxItem>
+          <ListBoxItem AutomationProperties.Name="Images">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <PathIcon Width="16" Height="16" Data="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" />
+              <TextBlock Text="Images" FontWeight="SemiBold" />
             </StackPanel>
           </ListBoxItem>
           <ListBoxItem AutomationProperties.Name="Disk usage">
@@ -375,6 +392,253 @@
               </ItemsControl.ItemTemplate>
             </ItemsControl>
           </ScrollViewer>
+        </DockPanel>
+      </TabItem>
+
+      <!-- ===== Images ===== -->
+      <TabItem>
+        <DockPanel DataContext="{Binding Images}" x:DataType="vm:ImagesViewModel" Margin="32,24,32,20">
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="pageTitle" Text="Image compression" />
+              <TextBlock Classes="pageSub" Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <Button Grid.Column="1" Classes="secondary" Content="Cancel" Command="{Binding CancelCommand}" IsVisible="{Binding IsBusy}"
+                    VerticalAlignment="Center" AutomationProperties.Name="Cancel image work" />
+          </Grid>
+
+          <Border DockPanel.Dock="Top" Classes="card" Padding="16,12" Margin="0,0,0,12">
+            <Grid ColumnDefinitions="*,8,Auto,12,Auto,8,Auto,8,Auto,12,Auto">
+              <TextBox Watermark="Folders with photos (separate with ;)" Text="{Binding Roots}" AutomationProperties.Name="Image folders" />
+              <Button Grid.Column="2" Classes="secondary" Content="Browse&#x2026;" Click="OnBrowseImages" AutomationProperties.Name="Browse image folders" />
+              <ComboBox Grid.Column="4" ItemsSource="{x:Static vm:ImagesViewModel.QualityModes}" SelectedIndex="{Binding ModeIndex}" Width="175" VerticalAlignment="Stretch" AutomationProperties.Name="Quality"
+                        ToolTip.Tip="Lossless only: pixel-identical output (JPEG repacking, PNG/TIFF re-compression). Visually lossless (recommended): each photo gets the lowest quality that still matches the original in a structural-similarity check, worst areas included. Smaller files: a looser similarity target for bigger savings.">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:QualityChoice">
+                    <StackPanel Spacing="2" Margin="0,2">
+                      <TextBlock Text="{Binding Title}" />
+                      <TextBlock Text="{Binding Hint}" Classes="sub" FontSize="12" TextWrapping="Wrap" Width="230" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+                <ComboBox.SelectionBoxItemTemplate>
+                  <DataTemplate x:DataType="vm:QualityChoice">
+                    <TextBlock Text="{Binding Title}" />
+                  </DataTemplate>
+                </ComboBox.SelectionBoxItemTemplate>
+              </ComboBox>
+              <ComboBox Grid.Column="6" SelectedIndex="{Binding FormatIndex}" Width="175" VerticalAlignment="Stretch" AutomationProperties.Name="Output format"
+                        ToolTip.Tip="Keep format: JPEG stays JPEG, PNG stays PNG, TIFF is re-packed losslessly, BMP becomes PNG. JPEG: also turns TIFF/HEIC photos into JPEG. WebP / AVIF / JPEG XL: converts photos for bigger savings (PNG/BMP become lossless WebP/JPEG XL), but fewer apps can open them.">
+                <ComboBoxItem Content="Keep format" />
+                <ComboBoxItem Content="JPEG (TIFF/HEIC too)" />
+                <ComboBoxItem Content="WebP" />
+                <ComboBoxItem Content="AVIF" />
+                <ComboBoxItem Content="JPEG XL" />
+              </ComboBox>
+              <Button Grid.Column="8" Classes="secondary" AutomationProperties.Name="Image options" ToolTip.Tip="Minimum size, resizing and file types">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <PathIcon Width="14" Height="14" Data="M3,17V19H9V17H3M3,5V7H13V5H3M13,21V19H21V17H13V15H11V21H13M7,9V11H3V13H7V15H9V9H7M21,13V11H11V13H21M15,9H17V7H21V5H17V3H15V9Z" />
+                  <TextBlock Text="Options" />
+                </StackPanel>
+                <Button.Flyout>
+                  <Flyout Placement="BottomEdgeAlignedRight">
+                    <StackPanel Spacing="12" Width="320" Margin="4">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel>
+                          <TextBlock Text="Minimum size" FontWeight="Medium" />
+                          <TextBlock Classes="sub" Text="Smaller images are not worth it." />
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Width="100" Text="{Binding MinSize}" AutomationProperties.Name="Minimum image size" />
+                      </Grid>
+                      <StackPanel Spacing="4">
+                        <TextBlock Text="Resize" FontWeight="Medium" />
+                        <ComboBox SelectedIndex="{Binding MaxDimensionIndex}" HorizontalAlignment="Stretch" AutomationProperties.Name="Resize">
+                          <ComboBoxItem Content="Keep original size" />
+                          <ComboBoxItem Content="Longest edge max 3840 px (4K)" />
+                          <ComboBoxItem Content="Longest edge max 2560 px" />
+                          <ComboBoxItem Content="Longest edge max 1920 px (Full HD)" />
+                        </ComboBox>
+                        <TextBlock Classes="sub" TextWrapping="Wrap" Text="Downscaling removes detail; keep the original size for archives." />
+                      </StackPanel>
+                      <CheckBox IsChecked="{Binding IncludePng}" Content="Include PNG (re-packed losslessly)" />
+                      <CheckBox IsChecked="{Binding IncludeBmp}" Content="Include BMP (converted to identical PNG)" />
+                      <CheckBox IsChecked="{Binding IncludeTiff}">
+                        <TextBlock TextWrapping="Wrap" Text="Include TIFF scans (re-packed losslessly, or converted with another format)" />
+                      </CheckBox>
+                      <CheckBox IsChecked="{Binding IncludeHeic}">
+                        <TextBlock TextWrapping="Wrap" Text="Include HEIC / HEIF iPhone photos (only converted: pick WebP, AVIF or JPEG XL)" />
+                      </CheckBox>
+                      <CheckBox IsChecked="{Binding AllowDropExtras}">
+                        <TextBlock TextWrapping="Wrap" Text="Allow dropping HDR gain maps / depth maps from phone photos (motion-photo videos are always kept)" />
+                      </CheckBox>
+                    </StackPanel>
+                  </Flyout>
+                </Button.Flyout>
+              </Button>
+              <Button Grid.Column="10" Classes="primary" Content="Find images" Command="{Binding FindCommand}" AutomationProperties.Name="Find images" />
+            </Grid>
+          </Border>
+
+          <!-- Compatibility warning for WebP / AVIF / JPEG XL -->
+          <Border DockPanel.Dock="Top" CornerRadius="10" Padding="14,8" Margin="0,0,0,12" Background="#FEF3C7" BorderBrush="#FCD34D" BorderThickness="1"
+                  IsVisible="{Binding HasCompatibilityNote}" ToolTip.Tip="{Binding CompatibilityNote}">
+            <Grid ColumnDefinitions="Auto,*">
+              <PathIcon Width="16" Height="16" Foreground="#B45309" VerticalAlignment="Top" Margin="0,1,10,0"
+                        Data="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z" />
+              <TextBlock Grid.Column="1" Text="{Binding CompatibilityNote}" Foreground="#92400E" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
+                         AutomationProperties.Name="Format compatibility warning" />
+            </Grid>
+          </Border>
+
+          <ProgressBar DockPanel.Dock="Top" Classes="thin" Minimum="0" Maximum="100" IsIndeterminate="{Binding IsProgressIndeterminate}"
+                       Value="{Binding Progress}" IsVisible="{Binding IsBusy}" Margin="0,0,0,12" />
+
+          <!-- Action bar -->
+          <Border DockPanel.Dock="Bottom" Classes="card" Padding="20,10" Margin="0,12,0,0" IsVisible="{Binding HasResults}">
+            <Grid ColumnDefinitions="Auto,*,Auto,12,Auto">
+              <StackPanel VerticalAlignment="Center" Orientation="Horizontal" Spacing="12">
+                <StackPanel VerticalAlignment="Center">
+                  <TextBlock Classes="label" Text="SELECTED SAVES" />
+                  <TextBlock FontSize="22" FontWeight="Bold" Foreground="{StaticResource Accent}" Text="{Binding SelectedText}" />
+                </StackPanel>
+                <TextBlock Classes="sub" Text="{Binding SelectedDetail}" VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="260" />
+              </StackPanel>
+              <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="6">
+                <ComboBox SelectedIndex="{Binding OriginalsIndex}" Width="280" AutomationProperties.Name="Originals">
+                  <ComboBoxItem Content="Move originals to Recycle Bin" />
+                  <ComboBoxItem Content="Delete originals permanently" />
+                  <ComboBoxItem Content="Keep originals, save copies to folder" />
+                </ComboBox>
+                <Grid ColumnDefinitions="*,6,Auto" Width="280" IsVisible="{Binding SaveCopies}">
+                  <TextBox Text="{Binding OutputFolder}" AutomationProperties.Name="Output folder" ToolTip.Tip="Compressed copies keep the folder structure below the searched folder" />
+                  <Button Grid.Column="2" Classes="secondary" Content="&#x2026;" Click="OnBrowseImageOutput" AutomationProperties.Name="Browse output folder" />
+                </Grid>
+              </StackPanel>
+              <Button Grid.Column="4" Classes="primary" Command="{Binding CompressCommand}" VerticalAlignment="Center" AutomationProperties.Name="Compress selected">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <PathIcon Width="16" Height="16" Foreground="White" Data="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" />
+                  <TextBlock Text="Compress selected" />
+                </StackPanel>
+              </Button>
+            </Grid>
+          </Border>
+
+          <Grid ColumnDefinitions="*,16,*">
+            <!-- Folders and images -->
+            <Border Classes="card" Padding="8">
+              <Panel>
+                <StackPanel IsVisible="{Binding !HasResults}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" MaxWidth="380">
+                  <Border Width="64" Height="64" CornerRadius="32" Background="{StaticResource AccentSoft}" HorizontalAlignment="Center">
+                    <PathIcon Width="28" Height="28" Foreground="{StaticResource Accent}"
+                              Data="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" />
+                  </Border>
+                  <TextBlock Text="Shrink photos without visible loss" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center" />
+                  <TextBlock Classes="muted" TextWrapping="Wrap" TextAlignment="Center" LineHeight="20"
+                             Text="Old camera photos, scans and screenshots are often stored far larger than needed. DevCleaner estimates every image, keeps Exif, GPS, colour profiles and file dates, and starts with nothing selected." />
+                </StackPanel>
+                <DockPanel IsVisible="{Binding HasResults}">
+                  <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" Margin="8,2,8,8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                      <Button Classes="secondary" Content="All" Command="{Binding SelectAllCommand}" AutomationProperties.Name="Select all images" />
+                      <Button Classes="secondary" Content="&#x2265; 33%" ToolTip.Tip="Select images that shrink by at least a third" Command="{Binding SelectBestCommand}" AutomationProperties.Name="Select images with big savings" />
+                      <Button Classes="secondary" Content="None" Command="{Binding SelectNoneCommand}" AutomationProperties.Name="Select no images" />
+                      <Button Classes="secondary" Content="{Binding ExpandAllText}" Command="{Binding ToggleAllExpandedCommand}" AutomationProperties.Name="Expand or collapse all folders" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0" ToolTip.Tip="{Binding FoundDetail}">
+                      <TextBlock HorizontalAlignment="Right" FontWeight="SemiBold" Foreground="{StaticResource Success}" TextTrimming="CharacterEllipsis"
+                                 Text="{Binding FoundText, StringFormat='{}{0} possible'}" />
+                      <TextBlock HorizontalAlignment="Right" Classes="sub" Text="{Binding FoundDetail}" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </Grid>
+                  <Grid DockPanel.Dock="Top" ColumnDefinitions="*,70,70,48" Margin="70,0,16,6">
+                    <TextBlock Classes="label" Text="FOLDER / IMAGE" />
+                    <TextBlock Grid.Column="1" Classes="label" Text="SIZE" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="2" Classes="label" Text="AFTER" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="3" Classes="label" Text="SAVED" HorizontalAlignment="Right" />
+                  </Grid>
+                  <Border DockPanel.Dock="Top" Height="1" Background="{StaticResource CardBorder}" Margin="8,0,8,4" />
+                  <ListBox Classes="rows" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
+                           ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Images found">
+                    <ListBox.DataTemplates>
+                      <DataTemplate DataType="vm:ImageFolderRow">
+                        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto" Background="Transparent" ToolTip.Tip="{Binding Path}">
+                          <Button Classes="chevron" Command="{Binding ToggleExpandedCommand}" Width="26" Height="26"
+                                        VerticalAlignment="Center" AutomationProperties.Name="Expand folder">
+                            <Panel>
+                              <PathIcon Width="10" Height="10" IsVisible="{Binding !IsExpanded}" Data="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+                              <PathIcon Width="10" Height="10" IsVisible="{Binding IsExpanded}" Data="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                            </Panel>
+                          </Button>
+                          <CheckBox Grid.Column="1" IsChecked="{Binding IsChecked}" MinWidth="0" Margin="4,0,6,0" VerticalAlignment="Center" AutomationProperties.Name="Select folder" />
+                          <Border Grid.Column="2" Width="30" Height="30" CornerRadius="8" Background="{StaticResource AccentSoft}" Margin="0,0,10,0">
+                            <PathIcon Width="14" Height="14" Foreground="{StaticResource Accent}"
+                                      Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" />
+                          </Border>
+                          <StackPanel Grid.Column="3" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding CountText}" Classes="sub" TextTrimming="CharacterEllipsis" />
+                          </StackPanel>
+                          <TextBlock Grid.Column="4" Text="{Binding SavingText}" FontWeight="SemiBold" Foreground="{StaticResource Success}"
+                                     VerticalAlignment="Center" Margin="12,0,4,0" />
+                        </Grid>
+                      </DataTemplate>
+                      <DataTemplate DataType="vm:ImageRow">
+                        <Grid ColumnDefinitions="Auto,*,70,70,48" Margin="36,0,4,0" Background="Transparent" ToolTip.Tip="{Binding ToolTip}">
+                          <Grid.ContextMenu>
+                            <ContextMenu>
+                              <MenuItem Header="Open file location" Click="OnOpenImageLocation" />
+                              <MenuItem Header="Copy path" Click="OnCopyImagePath" />
+                              <MenuItem Header="Exclude permanently" Click="OnExcludeImage" />
+                            </ContextMenu>
+                          </Grid.ContextMenu>
+                          <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding CanSelect}" MinWidth="0" Margin="0,0,8,0" VerticalAlignment="Center"
+                                    AutomationProperties.Name="Select image" />
+                          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                            <TextBlock Text="{Binding Name}" FontWeight="Medium" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{Binding DetailText}" Classes="sub" TextTrimming="CharacterEllipsis" />
+                          </StackPanel>
+                          <TextBlock Grid.Column="2" Text="{Binding SizeText}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="3" Text="{Binding ResultText}" Classes="muted" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="4" Text="{Binding SavedText}" FontWeight="SemiBold" Foreground="{StaticResource Success}"
+                                     HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+                      </DataTemplate>
+                    </ListBox.DataTemplates>
+                  </ListBox>
+                </DockPanel>
+              </Panel>
+            </Border>
+
+            <!-- Before / after preview -->
+            <Border Grid.Column="2" Classes="card" Padding="10">
+              <DockPanel>
+                <Grid DockPanel.Dock="Bottom" ColumnDefinitions="Auto,*,Auto" Margin="4,10,2,0" IsVisible="{Binding PreviewRow, Converter={x:Static ObjectConverters.IsNotNull}}">
+                  <StackPanel VerticalAlignment="Center" Margin="0,0,14,0">
+                    <TextBlock Classes="label" Text="SAVES" />
+                    <TextBlock Text="{Binding PreviewSavedText}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource Success}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="{Binding PreviewSizesText}" FontWeight="Medium" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding PreviewSizesText}" />
+                    <TextBlock Text="{Binding PreviewNote}" Classes="sub" TextWrapping="Wrap" MaxLines="2" ToolTip.Tip="{Binding PreviewNote}" />
+                  </StackPanel>
+                  <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4" Margin="10,0,0,0">
+                    <CheckBox IsChecked="{Binding PreviewRow.IsChecked}" IsEnabled="{Binding PreviewRow.CanSelect}" Content="Include"
+                              AutomationProperties.Name="Include previewed photo" />
+                    <Button Classes="secondary" Content="Show file" Click="OnOpenPreviewLocation" AutomationProperties.Name="Open previewed photo location" />
+                  </StackPanel>
+                </Grid>
+                <Panel>
+                  <Border CornerRadius="8" ClipToBounds="True">
+                    <ctl:ImageCompareControl Before="{Binding PreviewBefore}" After="{Binding PreviewAfter}" Title="{Binding PreviewTitle}"
+                                             AutomationProperties.Name="Before and after comparison" />
+                  </Border>
+                  <TextBlock IsVisible="{Binding !HasPreview}" Text="{Binding PreviewNote}" Foreground="#9CA3C7" TextWrapping="Wrap" TextAlignment="Center"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="260" />
+                  <ProgressBar Classes="thin" Width="80" IsIndeterminate="True" IsVisible="{Binding IsPreviewLoading}" VerticalAlignment="Bottom" Margin="0,0,0,40" />
+                </Panel>
+              </DockPanel>
+            </Border>
+          </Grid>
         </DockPanel>
       </TabItem>
 

@@ -69,8 +69,51 @@ public sealed partial class MainWindow : Window
 
     private async void OnOpenDuplicateLocation(object? sender, RoutedEventArgs e)
     {
-        if (DuplicatePathOf(sender) is not { } path)
-            return;
+        if (DuplicatePathOf(sender) is { } path)
+            await RevealAsync(path);
+    }
+
+    private static ImageRow? ImageRowOf(object? sender) => (sender as Control)?.DataContext as ImageRow;
+
+    private async void OnOpenImageLocation(object? sender, RoutedEventArgs e)
+    {
+        if (ImageRowOf(sender) is { } row)
+            await RevealAsync(row.Path);
+    }
+
+    private async void OnOpenPreviewLocation(object? sender, RoutedEventArgs e)
+    {
+        if (Vm?.Images.PreviewRow is { } row)
+            await RevealAsync(row.Path);
+    }
+
+    private async void OnCopyImagePath(object? sender, RoutedEventArgs e)
+    {
+        if (ImageRowOf(sender) is { } row && Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(row.Path);
+    }
+
+    private void OnExcludeImage(object? sender, RoutedEventArgs e)
+    {
+        if (ImageRowOf(sender) is { } row)
+            Vm?.Images.Exclude(row);
+    }
+
+    private async void OnBrowseImages(object? sender, RoutedEventArgs e)
+    {
+        if (Vm is { } vm && await PickFolderAsync() is { } path)
+            vm.Images.Roots = Append(vm.Images.Roots, path, "; ");
+    }
+
+    private async void OnBrowseImageOutput(object? sender, RoutedEventArgs e)
+    {
+        if (Vm is { } vm && await PickFolderAsync() is { } path)
+            vm.Images.OutputFolder = path;
+    }
+
+    /// <summary>Opens the containing folder, with the file selected where the OS supports it.</summary>
+    private async Task RevealAsync(string path)
+    {
         if (OperatingSystem.IsWindows() && File.Exists(path))
         {
             // Opens Explorer with the file pre-selected.

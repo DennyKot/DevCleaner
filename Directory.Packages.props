@@ -12,6 +12,11 @@
     <PackageVersion Include="Spectre.Console" Version="0.51.1" />
     <PackageVersion Include="Velopack" Version="1.2.161" />
     <PackageVersion Include="System.IO.Hashing" Version="10.0.0" />
+    <!-- Keep in sync with the SkiaSharp version Avalonia ships with. -->
+    <PackageVersion Include="SkiaSharp" Version="2.88.9" />
+    <PackageVersion Include="SkiaSharp.NativeAssets.Linux" Version="2.88.9" />
+    <!-- WebP/AVIF/JPEG XL encoding, HEIC/TIFF decoding, lossless JPEG repacking. Q16 keeps 16-bit TIFFs lossless. -->
+    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.17.2" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />

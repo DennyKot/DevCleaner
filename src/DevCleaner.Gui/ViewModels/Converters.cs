@@ -23,6 +23,7 @@ public static class CategoryInfo
         Category.Custom => "Custom",
         Category.Duplicates => "Duplicates",
         Category.GitIgnored => "Git-ignored output",
+        Category.Images => "Image compression",
         _ => c.ToString(),
     };
 
@@ -39,6 +40,7 @@ public static class CategoryInfo
         Category.Registry => "#64748B",
         Category.Logs => "#EF4444",
         Category.GitIgnored => "#F97316",
+        Category.Images => "#06B6D4",
         _ => "#6B7280",
     });
 
@@ -51,6 +53,7 @@ public static class CategoryInfo
         Category.Registry => Icons.Database,
         Category.Logs => Icons.File,
         Category.Duplicates => Icons.Copy,
+        Category.Images => Icons.Image,
         _ => Icons.Search,
     });
 
@@ -71,6 +74,7 @@ public static class Icons
     public const string Database = "M12,3C7.58,3 4,4.79 4,7C4,9.21 7.58,11 12,11C16.42,11 20,9.21 20,7C20,4.79 16.42,3 12,3M4,9V12C4,14.21 7.58,16 12,16C16.42,16 20,14.21 20,12V9C20,11.21 16.42,13 12,13C7.58,13 4,11.21 4,9M4,14V17C4,19.21 7.58,21 12,21C16.42,21 20,19.21 20,17V14C20,16.21 16.42,18 12,18C7.58,18 4,16.21 4,14Z";
     public const string File = "M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z";
     public const string Copy = "M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z";
+    public const string Image = "M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z";
     public const string Search = "M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z";
 }
 
