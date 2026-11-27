@@ -3,7 +3,6 @@ using System.IO.Hashing;
 using System.Runtime.InteropServices;
 using System.Text;
 using DevCleaner.Core;
-using DevCleaner.Core.Abstractions;
 using DevCleaner.Core.Engine;
 using DevCleaner.Core.Images;
 using SkiaSharp;

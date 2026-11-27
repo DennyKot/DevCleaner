@@ -2,12 +2,8 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DevCleaner.Core;
-using DevCleaner.Core.DiskUsage;
-using DevCleaner.Core.Duplicates;
 using DevCleaner.Core.Engine;
-using DevCleaner.Core.Search;
 using DevCleaner.Infrastructure;
-using DevCleaner.Infrastructure.Persistence;
 
 namespace DevCleaner.Gui.ViewModels;
 

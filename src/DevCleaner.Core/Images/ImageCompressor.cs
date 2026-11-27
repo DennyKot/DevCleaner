@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using SkiaSharp;
 
 namespace DevCleaner.Core.Images;
