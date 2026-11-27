@@ -7,13 +7,13 @@ DevCleaner: a .NET 10 tool that finds and safely cleans developer disk junk. Ava
 - `src/DevCleaner.Platform.Windows` – Recycle Bin (P/Invoke), Restart Manager, registry. Assembly is `[SupportedOSPlatform("windows")]`; guard callers with `OperatingSystem.IsWindows()`.
 - `src/DevCleaner.Platform.Unix` – placeholder (no trash yet).
 - `src/DevCleaner.Infrastructure` – JSON persistence (`DataStore`) + composition root (`AppHost`).
-- `src/DevCleaner.Gui` – Avalonia MVVM (CommunityToolkit.Mvvm). `src/DevCleaner.Cli` – System.CommandLine + Spectre.Console.
+- `src/DevCleaner.Gui` – Avalonia MVVM (CommunityToolkit.Mvvm); one view model per file in `ViewModels/`, all pages in `Views/MainWindow.axaml`, dialogs built in code (`Views/*Dialog.cs`). `src/DevCleaner.Cli` – System.CommandLine + Spectre.Console.
 - `tests/DevCleaner.Tests` – xUnit; file-system tests use real temp folders (`TempTree`).
 
 ## Commands
 ```powershell
-dotnet build DevCleaner.slnx
-dotnet test tests\DevCleaner.Tests
+dotnet build DevCleaner.slnx -v q -nologo
+dotnet test tests\DevCleaner.Tests -v q -nologo
 dotnet run --project src\DevCleaner.Cli -- scan --root <dir> --json
 dotnet run --project src\DevCleaner.Gui
 ```
