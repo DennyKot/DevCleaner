@@ -290,16 +290,4 @@ public sealed class ImageTests : IDisposable
         const int afterIhdr = 33;
         return [.. png.AsSpan(0, afterIhdr), .. chunk, .. png.AsSpan(afterIhdr)];
     }
-
-    private sealed class FakePlatform : IPlatformServices
-    {
-        public IRecycleBin RecycleBin => throw new NotSupportedException();
-        public IFileLockDetector LockDetector { get; } = new NoLocks();
-        public IReadOnlyList<ICleanupProvider> Providers => [];
-
-        private sealed class NoLocks : IFileLockDetector
-        {
-            public IReadOnlyList<string> GetLockingProcesses(string path) => [];
-        }
-    }
 }

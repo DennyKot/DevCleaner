@@ -312,16 +312,4 @@ public sealed class CoreTests : IDisposable
 
         public void Record(CleanReport report) => Last = report;
     }
-
-    private sealed class FakePlatform : IPlatformServices
-    {
-        public IRecycleBin RecycleBin => throw new NotSupportedException();
-        public IFileLockDetector LockDetector { get; } = new NoLocks();
-        public IReadOnlyList<ICleanupProvider> Providers => [];
-
-        private sealed class NoLocks : IFileLockDetector
-        {
-            public IReadOnlyList<string> GetLockingProcesses(string path) => [];
-        }
-    }
 }
